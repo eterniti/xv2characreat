@@ -5007,7 +5007,7 @@ void MainWindow::FillSevHLComboBox()
 
     for (const SevEntry &entry : *game_sev)
     {
-        if (entry.char_id >= XV2_FREE_ID_SEARCH_START)
+        if (Xenoverse2::IsModCms(entry.char_id))
             continue;
 
         CmsEntry *cms_entry = game_cms->FindEntryByID(entry.char_id);
@@ -6027,7 +6027,7 @@ void MainWindow::on_sevLLCopyButton_triggered(QAction *arg1)
 
                         if (cms_entry_this)
                         {
-                            if (ignore_mods && cevents.char_id >= XV2_FREE_ID_SEARCH_START)
+                            if (ignore_mods && Xenoverse2::IsModCms(cevents.char_id))
                                 continue;
 
                             cev.char_code = cms_entry_this->name;
@@ -6052,7 +6052,7 @@ void MainWindow::on_sevLLCopyButton_triggered(QAction *arg1)
                         if (!cms_entry_this)
                             continue;
 
-                        if (ignore_mods && o_entry.char_id >= XV2_FREE_ID_SEARCH_START)
+                        if (ignore_mods && Xenoverse2::IsModCms(o_entry.char_id))
                             continue;
 
                         for (const SevCharEvents &cevents : o_entry.chars_events)
@@ -7160,7 +7160,7 @@ void MainWindow::FillTtbHLComboBox()
     {
         CharCostumeDef cd;
 
-        if (entry.cms_id >= XV2_FREE_ID_SEARCH_START)
+        if (Xenoverse2::IsModCms(entry.cms_id))
             continue;
 
         CmsEntryXV2 *cms = dynamic_cast<CmsEntryXV2 *>(game_cms->FindEntryByID(entry.cms_id));
@@ -7178,7 +7178,7 @@ void MainWindow::FillTtbHLComboBox()
 
         for (const TtbEvent &event : entry.events)
         {
-            if (event.cms2_id < XV2_FREE_ID_SEARCH_START)
+            if (!Xenoverse2::IsModCms(event.cms2_id))
             {
                 cms = dynamic_cast<CmsEntryXV2 *>(game_cms->FindEntryByID(event.cms2_id));
 
@@ -7190,7 +7190,7 @@ void MainWindow::FillTtbHLComboBox()
                 }
             }
 
-            if (event.cms3_id < XV2_FREE_ID_SEARCH_START)
+            if (!Xenoverse2::IsModCms(event.cms3_id))
             {
                 cms = dynamic_cast<CmsEntryXV2 *>(game_cms->FindEntryByID(event.cms3_id));
 
@@ -7202,7 +7202,7 @@ void MainWindow::FillTtbHLComboBox()
                 }
             }
 
-            if (event.cms4_id < XV2_FREE_ID_SEARCH_START)
+            if (!Xenoverse2::IsModCms(event.cms4_id))
             {
                 cms = dynamic_cast<CmsEntryXV2 *>(game_cms->FindEntryByID(event.cms4_id));
 
@@ -7214,7 +7214,7 @@ void MainWindow::FillTtbHLComboBox()
                 }
             }
 
-            if (event.cms5_id < XV2_FREE_ID_SEARCH_START)
+            if (!Xenoverse2::IsModCms(event.cms5_id))
             {
                 cms = dynamic_cast<CmsEntryXV2 *>(game_cms->FindEntryByID(event.cms5_id));
 
@@ -7549,7 +7549,7 @@ void MainWindow::FillTtcHLComboBox()
         if (!cms)
             continue;
 
-        if (cms->id >= XV2_FREE_ID_SEARCH_START)
+        if (Xenoverse2::IsModCms(cms->id))
             continue;
 
         cd.code = cms->name;
