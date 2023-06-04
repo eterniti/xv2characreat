@@ -133,6 +133,7 @@ bool MainWindow::Initialize()
     ui->pscUB8Edit->setValidator(new QIntValidator(this));
     ui->pscUBCEdit->setValidator(new QIntValidator(this));
     ui->pscFC0Edit->setValidator(new QDoubleValidator(this));
+    ui->pscU14Edit->setValidator(new QIntValidator(this));
     ui->pscCopyButton->addAction(ui->actionFromGamePsc);
     ui->pscCopyButton->addAction(ui->actionFromGamePscBuf);
     ui->pscCopyButton->addAction(ui->actionFromExternalPsc);
@@ -1130,7 +1131,7 @@ bool MainWindow::Validate()
             ui->pscReinfEdit->text().isEmpty() || ui->pscF84Edit->text().isEmpty() || ui->pscRevivalHPEdit->text().isEmpty() ||
             ui->pscF8CEdit->text().isEmpty() || ui->pscRevivingSpeed->text().isEmpty() || ui->pscU98Edit->text().isEmpty() ||
             ui->pscSuperSoulEdit->text().isEmpty() || ui->pscUB8Edit->text().isEmpty() || ui->pscUBCEdit->text().isEmpty() ||
-            ui->pscFC0Edit->text().isEmpty())
+            ui->pscFC0Edit->text().isEmpty() || ui->pscU14Edit->text().isEmpty())
         {
             DPRINTF("[PSC] None of the fields at psc tab can be empty.\n");
             return false;
@@ -4288,6 +4289,7 @@ void MainWindow::PscEntryToGui(const PscSpecEntry &entry)
     ui->pscUB8Edit->setText(QString("%1").arg((int32_t)entry.unk_B8));
     ui->pscUBCEdit->setText(QString("%1").arg((int32_t)entry.unk_BC));
     ui->pscFC0Edit->setText(QString("%1").arg(entry.unk_C0));
+    ui->pscU14Edit->setText(QString("%1").arg((int32_t)entry.unk_14));
 }
 
 void MainWindow::GuiToPscEntry(PscSpecEntry &entry)
@@ -4334,6 +4336,7 @@ void MainWindow::GuiToPscEntry(PscSpecEntry &entry)
     entry.unk_B8 = (uint32_t) ui->pscUB8Edit->text().toInt();
     entry.unk_BC = (uint32_t) ui->pscUBCEdit->text().toInt();
     entry.unk_C0 = ui->pscFC0Edit->text().toFloat();
+    entry.unk_14 = (uint32_t) ui->pscU14Edit->text().toInt();
 }
 
 void MainWindow::on_pscCheck_clicked()
@@ -4383,6 +4386,7 @@ void MainWindow::on_pscCheck_clicked()
     ui->pscUB8Edit->setEnabled(checked);
     ui->pscUBCEdit->setEnabled(checked);
     ui->pscFC0Edit->setEnabled(checked);
+    ui->pscU14Edit->setEnabled(checked);
 
     ui->pscCostComboBox->setEnabled(checked);
     ui->pscAddButton->setEnabled(checked);

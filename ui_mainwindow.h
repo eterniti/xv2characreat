@@ -316,6 +316,8 @@ public:
     QLabel *label_77;
     QLineEdit *pscRevivingSpeed;
     QPushButton *pscSuperSoulButton;
+    QLabel *label_169;
+    QLineEdit *pscU14Edit;
     QWidget *aurTab;
     QToolButton *aurCopyButton;
     QPushButton *aurRemoveButton;
@@ -1428,6 +1430,12 @@ public:
         pscSuperSoulButton->setObjectName(QStringLiteral("pscSuperSoulButton"));
         pscSuperSoulButton->setGeometry(QRect(520, 330, 75, 23));
         pscSuperSoulButton->setFlat(true);
+        label_169 = new QLabel(pscTab);
+        label_169->setObjectName(QStringLiteral("label_169"));
+        label_169->setGeometry(QRect(562, 450, 49, 16));
+        pscU14Edit = new QLineEdit(pscTab);
+        pscU14Edit->setObjectName(QStringLiteral("pscU14Edit"));
+        pscU14Edit->setGeometry(QRect(600, 448, 111, 20));
         tabWidget->addTab(pscTab, QString());
         aurTab = new QWidget();
         aurTab->setObjectName(QStringLiteral("aurTab"));
@@ -2220,7 +2228,7 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 799, 21));
+        menuBar->setGeometry(QRect(0, 0, 799, 22));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
         menuHelp = new QMenu(menuBar);
@@ -2610,6 +2618,7 @@ public:
         label_76->setText(QApplication::translate("MainWindow", "F_84 / 10?:", 0));
         label_77->setText(QApplication::translate("MainWindow", "Reviving speed:", 0));
         pscSuperSoulButton->setText(QApplication::translate("MainWindow", "Super Soul:", 0));
+        label_169->setText(QApplication::translate("MainWindow", "U_14:", 0));
         tabWidget->setTabText(tabWidget->indexOf(pscTab), QApplication::translate("MainWindow", "PSC", 0));
         aurCopyButton->setText(QApplication::translate("MainWindow", "Copy", 0));
         aurRemoveButton->setText(QApplication::translate("MainWindow", "Remove", 0));
