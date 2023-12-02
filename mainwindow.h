@@ -276,6 +276,8 @@ private slots:
 
     void on_vfxCopyButton_clicked();
 
+    void on_aurBpeButton_triggered(QAction *arg1);
+
 protected:
     void closeEvent(QCloseEvent *event);
 
@@ -360,8 +362,8 @@ private:
     void PscEntryToGui(const PscSpecEntry &entry);
     void GuiToPscEntry(PscSpecEntry &entry);
 
-    void AurEntryToGui(const AurCharaLink &entry, const AurAura &aura);
-    void GuiToAurEntry(AurCharaLink &entry, AurAura &aura);
+    void AurEntryToGui(const AurCharaLink &entry, const AurAura &aura, const AuraExtraData &extra);
+    void GuiToAurEntry(AurCharaLink &entry, AurAura &aura, AuraExtraData &extra);
 
     void FillSevHLComboBox();
 

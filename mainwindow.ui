@@ -247,19 +247,6 @@
        <string>Copy from game</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="ozaruCheck">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>310</y>
-        <width>191</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>This char is an Ozaru (Great Ape)</string>
-      </property>
-     </widget>
      <widget class="QCheckBox" name="multNamesCheck">
       <property name="geometry">
        <rect>
@@ -518,6 +505,44 @@
       <property name="text">
        <string>Copy to clipboard</string>
       </property>
+     </widget>
+     <widget class="QLabel" name="label_170">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>310</y>
+        <width>91</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Character type:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="ctComboBox">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>308</y>
+        <width>69</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string>Normal</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Ozaru</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Cell Max</string>
+       </property>
+      </item>
      </widget>
     </widget>
     <widget class="QWidget" name="filesTab">
@@ -3317,6 +3342,74 @@
       </property>
       <property name="text">
        <string>HenshinStart:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_171">
+      <property name="geometry">
+       <rect>
+        <x>272</x>
+        <y>280</y>
+        <width>41</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Bpe Id:</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="auraBpeEdit">
+      <property name="geometry">
+       <rect>
+        <x>313</x>
+        <y>280</y>
+        <width>90</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="auraBpeFlag1Check">
+      <property name="geometry">
+       <rect>
+        <x>520</x>
+        <y>280</y>
+        <width>90</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Bpe flag 1</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="auraBpeFlag2Check">
+      <property name="geometry">
+       <rect>
+        <x>630</x>
+        <y>280</y>
+        <width>90</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Bpe flag 2</string>
+      </property>
+     </widget>
+     <widget class="QToolButton" name="aurBpeButton">
+      <property name="geometry">
+       <rect>
+        <x>420</x>
+        <y>279</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Set from</string>
+      </property>
+      <property name="popupMode">
+       <enum>QToolButton::InstantPopup</enum>
+      </property>
+      <property name="toolButtonStyle">
+       <enum>Qt::ToolButtonTextOnly</enum>
       </property>
      </widget>
     </widget>
@@ -6617,6 +6710,16 @@
    </property>
    <property name="toolTip">
     <string>From game (buffed stats)</string>
+   </property>
+  </action>
+  <action name="actionFromCmnBpe">
+   <property name="text">
+    <string>From cmn.bpe</string>
+   </property>
+  </action>
+  <action name="actionFromCmnBpeBO">
+   <property name="text">
+    <string>From cmn.bpe (only BodyOutline)</string>
    </property>
   </action>
  </widget>

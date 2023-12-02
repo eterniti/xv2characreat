@@ -81,6 +81,8 @@ public:
     QAction *actionFromGameCnc;
     QAction *actionFromExternalCnc;
     QAction *actionFromGamePscBuf;
+    QAction *actionFromCmnBpe;
+    QAction *actionFromCmnBpeBO;
     QWidget *centralWidget;
     QTabWidget *tabWidget;
     QWidget *modInfoTab;
@@ -97,7 +99,6 @@ public:
     QComboBox *charaNameLangComboBox;
     QPushButton *guidButton;
     QPushButton *charNameCopyButton;
-    QCheckBox *ozaruCheck;
     QCheckBox *multNamesCheck;
     QComboBox *multNamesComboBox;
     QPushButton *multNamesAddButton;
@@ -114,6 +115,8 @@ public:
     QCheckBox *canUseAnyDualSkillCheck;
     QLabel *label_161;
     QPushButton *guidCopyButton;
+    QLabel *label_170;
+    QComboBox *ctComboBox;
     QWidget *filesTab;
     QLabel *label_6;
     QLineEdit *charaFilesEdit;
@@ -342,6 +345,11 @@ public:
     QLabel *label_131;
     QLabel *label_132;
     QLabel *label_133;
+    QLabel *label_171;
+    QLineEdit *auraBpeEdit;
+    QCheckBox *auraBpeFlag1Check;
+    QCheckBox *auraBpeFlag2Check;
+    QToolButton *aurBpeButton;
     QWidget *sevTab;
     QCheckBox *sevCheck;
     QComboBox *sevModeComboBox;
@@ -675,6 +683,10 @@ public:
         actionFromExternalCnc->setObjectName(QStringLiteral("actionFromExternalCnc"));
         actionFromGamePscBuf = new QAction(MainWindow);
         actionFromGamePscBuf->setObjectName(QStringLiteral("actionFromGamePscBuf"));
+        actionFromCmnBpe = new QAction(MainWindow);
+        actionFromCmnBpe->setObjectName(QStringLiteral("actionFromCmnBpe"));
+        actionFromCmnBpeBO = new QAction(MainWindow);
+        actionFromCmnBpeBO->setObjectName(QStringLiteral("actionFromCmnBpeBO"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         tabWidget = new QTabWidget(centralWidget);
@@ -723,9 +735,6 @@ public:
         charNameCopyButton = new QPushButton(modInfoTab);
         charNameCopyButton->setObjectName(QStringLiteral("charNameCopyButton"));
         charNameCopyButton->setGeometry(QRect(500, 187, 95, 23));
-        ozaruCheck = new QCheckBox(modInfoTab);
-        ozaruCheck->setObjectName(QStringLiteral("ozaruCheck"));
-        ozaruCheck->setGeometry(QRect(10, 310, 191, 17));
         multNamesCheck = new QCheckBox(modInfoTab);
         multNamesCheck->setObjectName(QStringLiteral("multNamesCheck"));
         multNamesCheck->setGeometry(QRect(10, 230, 211, 17));
@@ -776,6 +785,12 @@ public:
         guidCopyButton = new QPushButton(modInfoTab);
         guidCopyButton->setObjectName(QStringLiteral("guidCopyButton"));
         guidCopyButton->setGeometry(QRect(405, 147, 95, 23));
+        label_170 = new QLabel(modInfoTab);
+        label_170->setObjectName(QStringLiteral("label_170"));
+        label_170->setGeometry(QRect(10, 310, 91, 16));
+        ctComboBox = new QComboBox(modInfoTab);
+        ctComboBox->setObjectName(QStringLiteral("ctComboBox"));
+        ctComboBox->setGeometry(QRect(120, 308, 69, 22));
         tabWidget->addTab(modInfoTab, QString());
         filesTab = new QWidget();
         filesTab->setObjectName(QStringLiteral("filesTab"));
@@ -1511,6 +1526,23 @@ public:
         label_133 = new QLabel(aurTab);
         label_133->setObjectName(QStringLiteral("label_133"));
         label_133->setGeometry(QRect(240, 240, 81, 16));
+        label_171 = new QLabel(aurTab);
+        label_171->setObjectName(QStringLiteral("label_171"));
+        label_171->setGeometry(QRect(272, 280, 41, 16));
+        auraBpeEdit = new QLineEdit(aurTab);
+        auraBpeEdit->setObjectName(QStringLiteral("auraBpeEdit"));
+        auraBpeEdit->setGeometry(QRect(313, 280, 90, 20));
+        auraBpeFlag1Check = new QCheckBox(aurTab);
+        auraBpeFlag1Check->setObjectName(QStringLiteral("auraBpeFlag1Check"));
+        auraBpeFlag1Check->setGeometry(QRect(520, 280, 90, 17));
+        auraBpeFlag2Check = new QCheckBox(aurTab);
+        auraBpeFlag2Check->setObjectName(QStringLiteral("auraBpeFlag2Check"));
+        auraBpeFlag2Check->setGeometry(QRect(630, 280, 90, 17));
+        aurBpeButton = new QToolButton(aurTab);
+        aurBpeButton->setObjectName(QStringLiteral("aurBpeButton"));
+        aurBpeButton->setGeometry(QRect(420, 279, 75, 23));
+        aurBpeButton->setPopupMode(QToolButton::InstantPopup);
+        aurBpeButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
         tabWidget->addTab(aurTab, QString());
         sevTab = new QWidget();
         sevTab->setObjectName(QStringLiteral("sevTab"));
@@ -2429,6 +2461,8 @@ public:
 #ifndef QT_NO_TOOLTIP
         actionFromGamePscBuf->setToolTip(QApplication::translate("MainWindow", "From game (buffed stats)", 0));
 #endif // QT_NO_TOOLTIP
+        actionFromCmnBpe->setText(QApplication::translate("MainWindow", "From cmn.bpe", 0));
+        actionFromCmnBpeBO->setText(QApplication::translate("MainWindow", "From cmn.bpe (only BodyOutline)", 0));
         label->setText(QApplication::translate("MainWindow", "Name:", 0));
         label_2->setText(QApplication::translate("MainWindow", "Version:", 0));
         label_3->setText(QApplication::translate("MainWindow", "Author:", 0));
@@ -2451,7 +2485,6 @@ public:
         );
         guidButton->setText(QApplication::translate("MainWindow", "Generate new", 0));
         charNameCopyButton->setText(QApplication::translate("MainWindow", "Copy from game", 0));
-        ozaruCheck->setText(QApplication::translate("MainWindow", "This char is an Ozaru (Great Ape)", 0));
         multNamesCheck->setText(QApplication::translate("MainWindow", "Use specific char names for costumes", 0));
         multNamesAddButton->setText(QApplication::translate("MainWindow", "Add", 0));
         multNamesRemoveButton->setText(QApplication::translate("MainWindow", "Remove", 0));
@@ -2478,6 +2511,13 @@ public:
         canUseAnyDualSkillCheck->setText(QApplication::translate("MainWindow", "This char can respond to any dual skill request (cac behaviour)", 0));
         label_161->setText(QApplication::translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">(Before checking this, make sure that the character bac, bcm and bdm are set to use dual skills too!)</span></p></body></html>", 0));
         guidCopyButton->setText(QApplication::translate("MainWindow", "Copy to clipboard", 0));
+        label_170->setText(QApplication::translate("MainWindow", "Character type:", 0));
+        ctComboBox->clear();
+        ctComboBox->insertItems(0, QStringList()
+         << QApplication::translate("MainWindow", "Normal", 0)
+         << QApplication::translate("MainWindow", "Ozaru", 0)
+         << QApplication::translate("MainWindow", "Cell Max", 0)
+        );
         tabWidget->setTabText(tabWidget->indexOf(modInfoTab), QApplication::translate("MainWindow", "Mod info", 0));
         label_6->setText(QApplication::translate("MainWindow", "Char files:", 0));
         charaFilesButton->setText(QApplication::translate("MainWindow", "Change", 0));
@@ -2634,6 +2674,10 @@ public:
         label_131->setText(QApplication::translate("MainWindow", "BoostLoop:", 0));
         label_132->setText(QApplication::translate("MainWindow", "KiaiCharge:", 0));
         label_133->setText(QApplication::translate("MainWindow", "HenshinStart:", 0));
+        label_171->setText(QApplication::translate("MainWindow", "Bpe Id:", 0));
+        auraBpeFlag1Check->setText(QApplication::translate("MainWindow", "Bpe flag 1", 0));
+        auraBpeFlag2Check->setText(QApplication::translate("MainWindow", "Bpe flag 2", 0));
+        aurBpeButton->setText(QApplication::translate("MainWindow", "Set from", 0));
         tabWidget->setTabText(tabWidget->indexOf(aurTab), QApplication::translate("MainWindow", "AUR", 0));
         sevCheck->setText(QApplication::translate("MainWindow", "Enable SEV", 0));
         sevModeComboBox->clear();

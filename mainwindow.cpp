@@ -21,6 +21,7 @@
 
 #include "Xenoverse2.h"
 #include "EmbFile.h"
+#include "BpeFile.h"
 #include "xv2ins_common.h"
 #include "Config.h"
 #include "debug.h"
@@ -146,10 +147,13 @@ bool MainWindow::Initialize()
     ui->auraEf4Edit->setValidator(new QIntValidator(this));
     ui->auraEf5Edit->setValidator(new QIntValidator(this));
     ui->auraEf6Edit->setValidator(new QIntValidator(this));
+    ui->auraBpeEdit->setValidator(new QIntValidator(this));
     ui->aurCopyButton->addAction(ui->actionFromGameAur);
     ui->aurCopyButton->addAction(ui->actionFromExternalAur);
     ui->aurCopyButton->addAction(ui->actionFromAuraCharUsage);
     ui->aurCopyButton->addAction(ui->actionFromAuraSkillUsage);
+    ui->aurBpeButton->addAction(ui->actionFromCmnBpeBO);
+    ui->aurBpeButton->addAction(ui->actionFromCmnBpe);
     // Sev tab
     ui->sevHLCostIndexEdit->setValidator(new QIntValidator(this));
     ui->sevLLCostIndexEdit->setValidator(new QIntValidator(this));
@@ -370,7 +374,19 @@ void MainWindow::ProcessX2m()
     ui->modVersionEdit->setText(QString::number(x2m->GetModVersion()));
     ui->modGuidEdit->setText(Utils::StdStringToQString(x2m->GetModGuid()));
     ui->charaNameEdit->setText(Utils::StdStringToQString(x2m->GetCharaName(ui->charaNameLangComboBox->currentIndex()), false));
-    ui->ozaruCheck->setChecked(x2m->IsOzaru());
+
+    if (x2m->IsOzaru())
+    {
+        ui->ctComboBox->setCurrentIndex(1);
+    }
+    else if (x2m->IsCellMax())
+    {
+        ui->ctComboBox->setCurrentIndex(2);
+    }
+    else
+    {
+        ui->ctComboBox->setCurrentIndex(0);
+    }
 
     if (x2m->HasMultNames())
     {
@@ -611,14 +627,15 @@ void MainWindow::ProcessX2m()
 
     while (x2m->GetNumCharaAuras(false) < x2m->GetNumAurEntries())
     {
-        AurAura aura;
-        x2m->AddCharaAura(aura);
+        AurAura aura; AuraExtraData extra;
+        x2m->AddCharaAura(aura, extra);
     }
 
     // Put dummy entry to gui
     AurCharaLink aur_entry;
     AurAura aura;
-    AurEntryToGui(aur_entry, aura);
+    AuraExtraData extra;
+    AurEntryToGui(aur_entry, aura, extra);
 
     on_aurCheck_clicked();
 
@@ -1193,6 +1210,12 @@ bool MainWindow::Validate()
                 DPRINTF("[AURA] HenshinEnd cannot be empty.\n");
                 return false;
             }
+
+            if (ui->auraBpeEdit->text().isEmpty())
+            {
+                DPRINTF("[AURA] Bpe Id cannot be empty.\n");
+                return false;
+            }
         }
         else
         {
@@ -1630,7 +1653,8 @@ bool MainWindow::Build()
     x2m->SetModVersion(ui->modVersionEdit->text().toFloat());
     // Guid is uneditable (and set by load or by constructor) - no need to set it here
     // Character name is already handled by on_charaNameEdit_textEdited
-    x2m->SetOzaru(ui->ozaruCheck->isChecked());
+    x2m->SetOzaru(ui->ctComboBox->currentIndex() == 1);
+    x2m->SetCellMax(ui->ctComboBox->currentIndex() == 2);
 
     if (ui->multNamesCheck->isChecked())
     {
@@ -2017,7 +2041,8 @@ bool MainWindow::Build()
 
         AurCharaLink &entry = x2m->GetAurEntry(aur_idx);
         AurAura &aura = x2m->GetCharaAura(aur_idx);
-        GuiToAurEntry(entry, aura);
+        AuraExtraData &extra = x2m->GetCharaAuraExtraData(aur_idx);
+        GuiToAurEntry(entry, aura, extra);
     }
     else
     {
@@ -4593,7 +4618,7 @@ void MainWindow::on_pscSuperSoulEdit_textChanged(const QString &arg1)
     }
 }
 
-void MainWindow::AurEntryToGui(const AurCharaLink &entry, const AurAura &aura)
+void MainWindow::AurEntryToGui(const AurCharaLink &entry, const AurAura &aura, const AuraExtraData &extra)
 {
     //ui->auraEdit->setText(QString("%1").arg((int32_t)entry.aura_id));
     ui->glareCheck->setChecked(entry.glare);    
@@ -4611,6 +4636,10 @@ void MainWindow::AurEntryToGui(const AurCharaLink &entry, const AurAura &aura)
         ui->auraEf4Edit->setEnabled(true);
         ui->auraEf5Edit->setEnabled(true);
         ui->auraEf6Edit->setEnabled(true);
+        ui->auraBpeEdit->setEnabled(true);
+        ui->aurBpeButton->setEnabled(true);
+        ui->auraBpeFlag1Check->setEnabled(true);
+        ui->auraBpeFlag2Check->setEnabled(true);
     }
     else
     {
@@ -4625,6 +4654,10 @@ void MainWindow::AurEntryToGui(const AurCharaLink &entry, const AurAura &aura)
         ui->auraEf4Edit->setDisabled(true);
         ui->auraEf5Edit->setDisabled(true);
         ui->auraEf6Edit->setDisabled(true);
+        ui->auraBpeEdit->setDisabled(true);
+        ui->aurBpeButton->setDisabled(true);
+        ui->auraBpeFlag1Check->setDisabled(true);
+        ui->auraBpeFlag2Check->setDisabled(true);
     }
 
     if (aura.effects.size() >= 1)
@@ -4689,9 +4722,13 @@ void MainWindow::AurEntryToGui(const AurCharaLink &entry, const AurAura &aura)
     {
         ui->auraEf6Edit->setText("-1");
     }
+
+    ui->auraBpeEdit->setText(QString("%1").arg(extra.bpe_id));
+    ui->auraBpeFlag1Check->setChecked(extra.flag1);
+    ui->auraBpeFlag2Check->setChecked(extra.flag2);
 }
 
-void MainWindow::GuiToAurEntry(AurCharaLink &entry, AurAura &aura)
+void MainWindow::GuiToAurEntry(AurCharaLink &entry, AurAura &aura, AuraExtraData &extra)
 {
     entry.aura_id = (uint32_t) ui->auraEdit->text().toInt();
     entry.glare = ui->glareCheck->isChecked();
@@ -4720,6 +4757,10 @@ void MainWindow::GuiToAurEntry(AurCharaLink &entry, AurAura &aura)
     aura.effects[4].id = (uint32_t) ui->auraEf4Edit->text().toInt();
     aura.effects[5].id = (uint32_t) ui->auraEf5Edit->text().toInt();
     aura.effects[6].id = (uint32_t) ui->auraEf6Edit->text().toInt();
+
+    extra.bpe_id = ui->auraBpeEdit->text().toInt();
+    extra.flag1 = ui->auraBpeFlag1Check->isChecked();
+    extra.flag2 = ui->auraBpeFlag2Check->isChecked();
 }
 
 void MainWindow::on_aurCheck_clicked()
@@ -4741,6 +4782,10 @@ void MainWindow::on_aurCheck_clicked()
     ui->auraEf4Edit->setEnabled(checked && checked_custom);
     ui->auraEf5Edit->setEnabled(checked && checked_custom);
     ui->auraEf6Edit->setEnabled(checked && checked_custom);
+    ui->auraBpeEdit->setEnabled(checked && checked_custom);
+    ui->aurBpeButton->setEnabled(checked && checked_custom);
+    ui->auraBpeFlag1Check->setEnabled(checked && checked_custom);
+    ui->auraBpeFlag2Check->setEnabled(checked && checked_custom);
 
     if (checked)
     {
@@ -4754,10 +4799,11 @@ void MainWindow::on_aurCheck_clicked()
         {
             AurCharaLink entry;
             AurAura aura;
+            AuraExtraData extra;
 
-            GuiToAurEntry(entry, aura);
+            GuiToAurEntry(entry, aura, extra);
             x2m->AddAurEntry(entry);
-            x2m->AddCharaAura(aura);
+            x2m->AddCharaAura(aura, extra);
             num_aur_entries++;
         }
 
@@ -4790,12 +4836,14 @@ void MainWindow::on_aurCostComboBox_currentIndexChanged(int index)
     {
         AurCharaLink &entry = x2m->GetAurEntry(prev_aur_cost_index);
         AurAura &aura = x2m->GetCharaAura(prev_aur_cost_index);
-        GuiToAurEntry(entry, aura);
+        AuraExtraData &extra = x2m->GetCharaAuraExtraData(prev_aur_cost_index);
+        GuiToAurEntry(entry, aura, extra);
     }
 
     const AurCharaLink &entry = x2m->GetAurEntry(index);
     const AurAura &aura = x2m->GetCharaAura(index);
-    AurEntryToGui(entry, aura);
+    const AuraExtraData &extra = x2m->GetCharaAuraExtraData(index);
+    AurEntryToGui(entry, aura, extra);
 
     prev_aur_cost_index = index;
 }
@@ -4804,15 +4852,16 @@ void MainWindow::on_aurAddButton_clicked()
 {
     AurCharaLink entry;
     AurAura aura;
+    AuraExtraData extra;
 
     int idx = ui->aurCostComboBox->currentIndex();
     if (idx >= 0 && idx < x2m->GetNumAurEntries())
     {
-        GuiToAurEntry(entry, aura);
+        GuiToAurEntry(entry, aura, extra);
     }
 
     size_t pos = x2m->AddAurEntry(entry);
-    if (x2m->AddCharaAura(aura) != pos)
+    if (x2m->AddCharaAura(aura, extra) != pos)
     {
         DPRINTF("%s: Internal syncronization bug.\n", FUNCNAME);
         exit(-1);
@@ -4866,7 +4915,8 @@ void MainWindow::on_aurCopyButton_triggered(QAction *arg1)
 
     AurCharaLink &entry = x2m->GetAurEntry(idx);
     AurAura &aura = x2m->GetCharaAura(idx);
-    GuiToAurEntry(entry, aura);
+    AuraExtraData &extra = x2m->GetCharaAuraExtraData(idx);
+    GuiToAurEntry(entry, aura, extra);
 
     if (arg1 == ui->actionFromAuraSkillUsage)
     {
@@ -4879,13 +4929,14 @@ void MainWindow::on_aurCopyButton_triggered(QAction *arg1)
 
             if (existing_aura)
             {
-                aura = *existing_aura;
+                aura = *existing_aura;                
+                Xenoverse2::GetAuraExtra(aura.id, extra);
 
                 if (entry.aura_id != X2M_INVALID_ID)
                     entry.aura_id = aura.id;
 
-                aura.id = X2M_DUMMY_ID;
-                AurEntryToGui(entry, aura);
+                aura.id = X2M_DUMMY_ID;                
+                AurEntryToGui(entry, aura, extra);
             }
         }
 
@@ -4909,6 +4960,7 @@ void MainWindow::on_aurCopyButton_triggered(QAction *arg1)
             if (existing_aura)
             {
                 aura = *existing_aura;
+                Xenoverse2::GetAuraExtra(aura.id, extra);
 
                 if (entry.aura_id != X2M_INVALID_ID)
                     entry.aura_id = aura.id;
@@ -4916,7 +4968,7 @@ void MainWindow::on_aurCopyButton_triggered(QAction *arg1)
                 entry.glare = chara_links[idx].glare;
                 aura.id = X2M_DUMMY_ID;
 
-                AurEntryToGui(entry, aura);
+                AurEntryToGui(entry, aura, extra);
             }
         }
 
@@ -4962,12 +5014,13 @@ void MainWindow::on_aurCopyButton_triggered(QAction *arg1)
                 return;
 
             aura = auras[idx];
+            Xenoverse2::GetAuraExtra(aura.id, extra);
 
             if (entry.aura_id != X2M_INVALID_ID)
                 entry.aura_id = aura.id;
 
-            aura.id = X2M_DUMMY_ID;
-            AurEntryToGui(entry, aura);
+            aura.id = X2M_DUMMY_ID;            
+            AurEntryToGui(entry, aura, extra);
         }
 
         delete dialog;
@@ -4991,6 +5044,10 @@ void MainWindow::on_auraCustomCheck_clicked()
         ui->auraEf4Edit->setEnabled(true);
         ui->auraEf5Edit->setEnabled(true);
         ui->auraEf6Edit->setEnabled(true);
+        ui->auraBpeEdit->setEnabled(true);
+        ui->aurBpeButton->setEnabled(true);
+        ui->auraBpeFlag1Check->setEnabled(true);
+        ui->auraBpeFlag2Check->setEnabled(true);
     }
     else
     {
@@ -5002,6 +5059,10 @@ void MainWindow::on_auraCustomCheck_clicked()
         ui->auraEf4Edit->setDisabled(true);
         ui->auraEf5Edit->setDisabled(true);
         ui->auraEf6Edit->setDisabled(true);
+        ui->auraBpeEdit->setDisabled(true);
+        ui->aurBpeButton->setDisabled(true);
+        ui->auraBpeFlag1Check->setDisabled(true);
+        ui->auraBpeFlag2Check->setDisabled(true);
     }
 }
 
@@ -9379,3 +9440,35 @@ void MainWindow::on_vfxCopyButton_clicked()
         ui->vfxEdit->setText(Utils::StdStringToQString(game_ers->GetCharEepk(cms_entry->id)));
     }
 }
+
+void MainWindow::on_aurBpeButton_triggered(QAction *arg1)
+{
+    bool outline = false;
+
+    if (arg1 == ui->actionFromCmnBpeBO)
+        outline = true;
+    else if (arg1 != ui->actionFromCmnBpe)
+        return;
+
+    BpeFile bpe;
+    if (!xv2fs->LoadFile(&bpe, "/data/pe/cmn.bpe"))
+    {
+        DPRINTF("Load of bpe failed.\n");
+        return;
+    }
+
+    ListDialog dialog(ListMode::BPE, this, &bpe, (outline) ? BPE_FLAG_OUTLINE : 0);
+    if (dialog.exec())
+    {
+        QString ns = dialog.GetResult();
+        if (!outline)
+        {
+            int idx = ns.indexOf(" (");
+            if (idx >= 0)
+                ns = ns.mid(0, idx);
+        }
+
+        ui->auraBpeEdit->setText(ns);
+    }
+}
+
