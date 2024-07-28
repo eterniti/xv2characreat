@@ -138,6 +138,7 @@ public:
          << QApplication::translate("TtbCharEventDialog", "Chinese (tw)", 0)
          << QApplication::translate("TtbCharEventDialog", "Chinese (zh)", 0)
          << QApplication::translate("TtbCharEventDialog", "Korean", 0)
+         << QApplication::translate("TtbCharEventDialog", "Japanese", 0)
         );
     } // retranslateUi
 

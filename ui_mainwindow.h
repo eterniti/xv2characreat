@@ -283,7 +283,6 @@ public:
     QLineEdit *pscKiDefEdit;
     QLineEdit *pscStrAtkDefEdit;
     QLineEdit *pscKiBlastDefEdit;
-    QLineEdit *pscSuperSoulEdit;
     QLabel *label_61;
     QLabel *label_62;
     QLabel *label_63;
@@ -318,9 +317,15 @@ public:
     QLineEdit *pscF84Edit;
     QLabel *label_77;
     QLineEdit *pscRevivingSpeed;
-    QPushButton *pscSuperSoulButton;
     QLabel *label_169;
     QLineEdit *pscU14Edit;
+    QLabel *label_172;
+    QComboBox *pscSuperSoulComboBox;
+    QLabel *label_173;
+    QComboBox *pscDependsComboBox;
+    QPushButton *pscDependsAddButton;
+    QPushButton *pscDependsUpdateButton;
+    QPushButton *pscDependsRemoveButton;
     QWidget *aurTab;
     QToolButton *aurCopyButton;
     QPushButton *aurRemoveButton;
@@ -588,7 +593,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(799, 710);
+        MainWindow->resize(900, 710);
         actionOpen = new QAction(MainWindow);
         actionOpen->setObjectName(QStringLiteral("actionOpen"));
         actionSave = new QAction(MainWindow);
@@ -691,7 +696,7 @@ public:
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         tabWidget = new QTabWidget(centralWidget);
         tabWidget->setObjectName(QStringLiteral("tabWidget"));
-        tabWidget->setGeometry(QRect(30, 20, 741, 616));
+        tabWidget->setGeometry(QRect(30, 20, 842, 616));
         modInfoTab = new QWidget();
         modInfoTab->setObjectName(QStringLiteral("modInfoTab"));
         modInfoTab->setAutoFillBackground(true);
@@ -1097,7 +1102,7 @@ public:
         cusCopyButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
         label_126 = new QLabel(cusTab);
         label_126->setObjectName(QStringLiteral("label_126"));
-        label_126->setGeometry(QRect(20, 330, 161, 16));
+        label_126->setGeometry(QRect(20, 330, 211, 16));
         cusDependsComboBox = new QComboBox(cusTab);
         cusDependsComboBox->setObjectName(QStringLiteral("cusDependsComboBox"));
         cusDependsComboBox->setGeometry(QRect(20, 370, 441, 22));
@@ -1336,9 +1341,6 @@ public:
         pscKiBlastDefEdit = new QLineEdit(pscTab);
         pscKiBlastDefEdit->setObjectName(QStringLiteral("pscKiBlastDefEdit"));
         pscKiBlastDefEdit->setGeometry(QRect(367, 388, 111, 20));
-        pscSuperSoulEdit = new QLineEdit(pscTab);
-        pscSuperSoulEdit->setObjectName(QStringLiteral("pscSuperSoulEdit"));
-        pscSuperSoulEdit->setGeometry(QRect(600, 328, 111, 20));
         label_61 = new QLabel(pscTab);
         label_61->setObjectName(QStringLiteral("label_61"));
         label_61->setGeometry(QRect(562, 360, 41, 16));
@@ -1441,16 +1443,33 @@ public:
         pscRevivingSpeed = new QLineEdit(pscTab);
         pscRevivingSpeed->setObjectName(QStringLiteral("pscRevivingSpeed"));
         pscRevivingSpeed->setGeometry(QRect(600, 268, 111, 20));
-        pscSuperSoulButton = new QPushButton(pscTab);
-        pscSuperSoulButton->setObjectName(QStringLiteral("pscSuperSoulButton"));
-        pscSuperSoulButton->setGeometry(QRect(520, 330, 75, 23));
-        pscSuperSoulButton->setFlat(true);
         label_169 = new QLabel(pscTab);
         label_169->setObjectName(QStringLiteral("label_169"));
         label_169->setGeometry(QRect(562, 450, 49, 16));
         pscU14Edit = new QLineEdit(pscTab);
         pscU14Edit->setObjectName(QStringLiteral("pscU14Edit"));
         pscU14Edit->setGeometry(QRect(600, 448, 111, 20));
+        label_172 = new QLabel(pscTab);
+        label_172->setObjectName(QStringLiteral("label_172"));
+        label_172->setGeometry(QRect(532, 330, 61, 16));
+        pscSuperSoulComboBox = new QComboBox(pscTab);
+        pscSuperSoulComboBox->setObjectName(QStringLiteral("pscSuperSoulComboBox"));
+        pscSuperSoulComboBox->setGeometry(QRect(600, 328, 231, 22));
+        label_173 = new QLabel(pscTab);
+        label_173->setObjectName(QStringLiteral("label_173"));
+        label_173->setGeometry(QRect(20, 520, 301, 16));
+        pscDependsComboBox = new QComboBox(pscTab);
+        pscDependsComboBox->setObjectName(QStringLiteral("pscDependsComboBox"));
+        pscDependsComboBox->setGeometry(QRect(20, 550, 441, 22));
+        pscDependsAddButton = new QPushButton(pscTab);
+        pscDependsAddButton->setObjectName(QStringLiteral("pscDependsAddButton"));
+        pscDependsAddButton->setGeometry(QRect(480, 550, 75, 23));
+        pscDependsUpdateButton = new QPushButton(pscTab);
+        pscDependsUpdateButton->setObjectName(QStringLiteral("pscDependsUpdateButton"));
+        pscDependsUpdateButton->setGeometry(QRect(640, 550, 75, 23));
+        pscDependsRemoveButton = new QPushButton(pscTab);
+        pscDependsRemoveButton->setObjectName(QStringLiteral("pscDependsRemoveButton"));
+        pscDependsRemoveButton->setGeometry(QRect(560, 550, 75, 23));
         tabWidget->addTab(pscTab, QString());
         aurTab = new QWidget();
         aurTab->setObjectName(QStringLiteral("aurTab"));
@@ -2260,7 +2279,7 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 799, 22));
+        menuBar->setGeometry(QRect(0, 0, 900, 22));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
         menuHelp = new QMenu(menuBar);
@@ -2482,6 +2501,7 @@ public:
          << QApplication::translate("MainWindow", "Chinese (tw)", 0)
          << QApplication::translate("MainWindow", "Chinese (zh)", 0)
          << QApplication::translate("MainWindow", "Korean", 0)
+         << QApplication::translate("MainWindow", "Japanese", 0)
         );
         guidButton->setText(QApplication::translate("MainWindow", "Generate new", 0));
         charNameCopyButton->setText(QApplication::translate("MainWindow", "Copy from game", 0));
@@ -2505,6 +2525,7 @@ public:
          << QApplication::translate("MainWindow", "Chinese (tw)", 0)
          << QApplication::translate("MainWindow", "Chinese (zh)", 0)
          << QApplication::translate("MainWindow", "Korean", 0)
+         << QApplication::translate("MainWindow", "Japanese", 0)
         );
         bodyShapeCheck->setText(QApplication::translate("MainWindow", "Force game to use following bcs body:", 0));
         charNameClearButon->setText(QApplication::translate("MainWindow", "Clear", 0));
@@ -2549,6 +2570,7 @@ public:
          << QApplication::translate("MainWindow", "Chinese (tw)", 0)
          << QApplication::translate("MainWindow", "Chinese (zh)", 0)
          << QApplication::translate("MainWindow", "Korean", 0)
+         << QApplication::translate("MainWindow", "Japanese", 0)
         );
         label_12->setText(QApplication::translate("MainWindow", "Costume index:", 0));
         label_13->setText(QApplication::translate("MainWindow", "Model preset:", 0));
@@ -2657,8 +2679,12 @@ public:
         label_75->setText(QApplication::translate("MainWindow", "Reinf. Skill Duration:", 0));
         label_76->setText(QApplication::translate("MainWindow", "F_84 / 10?:", 0));
         label_77->setText(QApplication::translate("MainWindow", "Reviving speed:", 0));
-        pscSuperSoulButton->setText(QApplication::translate("MainWindow", "Super Soul:", 0));
         label_169->setText(QApplication::translate("MainWindow", "U_14:", 0));
+        label_172->setText(QApplication::translate("MainWindow", "Super Soul:", 0));
+        label_173->setText(QApplication::translate("MainWindow", "Custom Super Soul linking/embeddding:", 0));
+        pscDependsAddButton->setText(QApplication::translate("MainWindow", "Add", 0));
+        pscDependsUpdateButton->setText(QApplication::translate("MainWindow", "Update", 0));
+        pscDependsRemoveButton->setText(QApplication::translate("MainWindow", "Remove", 0));
         tabWidget->setTabText(tabWidget->indexOf(pscTab), QApplication::translate("MainWindow", "PSC", 0));
         aurCopyButton->setText(QApplication::translate("MainWindow", "Copy", 0));
         aurRemoveButton->setText(QApplication::translate("MainWindow", "Remove", 0));

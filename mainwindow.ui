@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>799</width>
+    <width>900</width>
     <height>710</height>
    </rect>
   </property>
@@ -19,7 +19,7 @@
      <rect>
       <x>30</x>
       <y>20</y>
-      <width>741</width>
+      <width>842</width>
       <height>616</height>
      </rect>
     </property>
@@ -218,6 +218,11 @@
       <item>
        <property name="text">
         <string>Korean</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Japanese</string>
        </property>
       </item>
      </widget>
@@ -422,6 +427,11 @@
       <item>
        <property name="text">
         <string>Korean</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Japanese</string>
        </property>
       </item>
      </widget>
@@ -910,6 +920,11 @@
       <item>
        <property name="text">
         <string>Korean</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Japanese</string>
        </property>
       </item>
      </widget>
@@ -1773,7 +1788,7 @@
        <rect>
         <x>20</x>
         <y>330</y>
-        <width>161</width>
+        <width>211</width>
         <height>16</height>
        </rect>
       </property>
@@ -2618,16 +2633,6 @@
        </rect>
       </property>
      </widget>
-     <widget class="QLineEdit" name="pscSuperSoulEdit">
-      <property name="geometry">
-       <rect>
-        <x>600</x>
-        <y>328</y>
-        <width>111</width>
-        <height>20</height>
-       </rect>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_61">
       <property name="geometry">
        <rect>
@@ -3019,22 +3024,6 @@
        </rect>
       </property>
      </widget>
-     <widget class="QPushButton" name="pscSuperSoulButton">
-      <property name="geometry">
-       <rect>
-        <x>520</x>
-        <y>330</y>
-        <width>75</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Super Soul:</string>
-      </property>
-      <property name="flat">
-       <bool>true</bool>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_169">
       <property name="geometry">
        <rect>
@@ -3056,6 +3045,91 @@
         <width>111</width>
         <height>20</height>
        </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_172">
+      <property name="geometry">
+       <rect>
+        <x>532</x>
+        <y>330</y>
+        <width>61</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Super Soul:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="pscSuperSoulComboBox">
+      <property name="geometry">
+       <rect>
+        <x>600</x>
+        <y>328</y>
+        <width>231</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_173">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>520</y>
+        <width>301</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Custom Super Soul linking/embeddding:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="pscDependsComboBox">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>550</y>
+        <width>441</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pscDependsAddButton">
+      <property name="geometry">
+       <rect>
+        <x>480</x>
+        <y>550</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Add</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pscDependsUpdateButton">
+      <property name="geometry">
+       <rect>
+        <x>640</x>
+        <y>550</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Update</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pscDependsRemoveButton">
+      <property name="geometry">
+       <rect>
+        <x>560</x>
+        <y>550</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Remove</string>
       </property>
      </widget>
     </widget>
@@ -6324,7 +6398,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>799</width>
+     <width>900</width>
      <height>22</height>
     </rect>
    </property>

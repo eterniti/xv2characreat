@@ -13,7 +13,6 @@
 #include "ui_mainwindow.h"
 
 #include "listdialog.h"
-#include "cssdialog.h"
 #include "embdialog.h"
 #include "waitdialog.h"
 #include "ttbchareventdialog.h"
@@ -129,8 +128,6 @@ bool MainWindow::Initialize()
     ui->pscF8CEdit->setValidator(new QDoubleValidator(this));
     ui->pscRevivingSpeed->setValidator(new QDoubleValidator(this));
     ui->pscU98Edit->setValidator(new QIntValidator(this));
-    ui->pscSuperSoulEdit->setValidator(new QIntValidator(this));
-    ui->pscSuperSoulButton->setStyleSheet("font-weight: bold;");
     ui->pscUB8Edit->setValidator(new QIntValidator(this));
     ui->pscUBCEdit->setValidator(new QIntValidator(this));
     ui->pscFC0Edit->setValidator(new QDoubleValidator(this));
@@ -268,6 +265,8 @@ bool MainWindow::Initialize()
     FillAwakenComboBox(ui->awakenComboBox);
     // Slots tab (post)
     ui->voiceListenLangComboBox->setCurrentIndex(config.listen_css_language_english ? 1 : 0);
+    // Psc tab (post)
+    FillSuperSoul(ui->pscSuperSoulComboBox);
     // Sev tab (post)
     FillSevHLComboBox();
     ui->sevListenLangComboBox->setCurrentIndex(config.listen_sev_language_english ? 1 : 0);
@@ -336,6 +335,14 @@ bool MainWindow::Initialize()
 
             QString file = qApp->arguments()[1];
             Utils::RunProgram("xv2questcreat.exe", { Utils::QStringToStdString(file) }, false);
+            return false;
+        }
+        else if (x2m->GetType() == X2mType::NEW_SUPERSOUL)
+        {
+            delete x2m; x2m = nullptr;
+
+            QString file = qApp->arguments()[1];
+            Utils::RunProgram("xv2sscreat.exe", { Utils::QStringToStdString(file) }, false);
             return false;
         }
 
@@ -607,6 +614,40 @@ void MainWindow::ProcessX2m()
     else
     {
         ui->pscCheck->setChecked(false);
+    }
+
+    // Handle depends first
+    ui->pscDependsComboBox->clear();
+    EraseCustomSuperSoul(ui->pscSuperSoulComboBox);
+
+    if (x2m->HasCharaSsDepends())
+    {
+        FillCustomSuperSoul(ui->pscSuperSoulComboBox);
+
+        for (size_t i = 0; i < x2m->GetNumCharaSsDepends(); i++)
+        {
+            QString text;
+
+            if (x2m->CharaSsDependsHasAttachment(i))
+            {
+                text = "[EMBEDDED] ";
+            }
+            else
+            {
+                text = "[LINKED] ";
+            }
+
+            text += Utils::StdStringToQString(x2m->GetCharaSsDepends(i).name, false);
+            ui->pscDependsComboBox->addItem(text);
+        }
+
+        ui->pscDependsRemoveButton->setEnabled(true);
+        ui->pscDependsUpdateButton->setEnabled(true);
+    }
+    else
+    {
+        ui->pscDependsRemoveButton->setEnabled(false);
+        ui->pscDependsUpdateButton->setEnabled(false);
     }
 
     // Put dummy entry to gui
@@ -1147,8 +1188,8 @@ bool MainWindow::Validate()
             ui->pscBoostSpeedEdit->text().isEmpty() || ui->pscDashDistEdit->text().isEmpty() || ui->pscF7CEdit->text().isEmpty() ||
             ui->pscReinfEdit->text().isEmpty() || ui->pscF84Edit->text().isEmpty() || ui->pscRevivalHPEdit->text().isEmpty() ||
             ui->pscF8CEdit->text().isEmpty() || ui->pscRevivingSpeed->text().isEmpty() || ui->pscU98Edit->text().isEmpty() ||
-            ui->pscSuperSoulEdit->text().isEmpty() || ui->pscUB8Edit->text().isEmpty() || ui->pscUBCEdit->text().isEmpty() ||
-            ui->pscFC0Edit->text().isEmpty() || ui->pscU14Edit->text().isEmpty())
+            ui->pscUB8Edit->text().isEmpty() || ui->pscUBCEdit->text().isEmpty() || ui->pscFC0Edit->text().isEmpty() ||
+            ui->pscU14Edit->text().isEmpty())
         {
             DPRINTF("[PSC] None of the fields at psc tab can be empty.\n");
             return false;
@@ -1965,15 +2006,15 @@ bool MainWindow::Build()
 
         if (!x2m->IsCharaSkillDependsReferenced(dep))
         {
-            RemoveSkill(ui->super1ComboBox, dep.id);
-            RemoveSkill(ui->super2ComboBox, dep.id);
-            RemoveSkill(ui->super3ComboBox, dep.id);
-            RemoveSkill(ui->super4ComboBox, dep.id);
-            RemoveSkill(ui->ultimate1ComboBox, dep.id);
-            RemoveSkill(ui->ultimate2ComboBox, dep.id);
-            RemoveSkill(ui->evasiveComboBox, dep.id);
-            RemoveSkill(ui->blastComboBox, dep.id);
-            RemoveSkill(ui->awakenComboBox, dep.id);
+            RemoveSkillOrSs(ui->super1ComboBox, dep.id);
+            RemoveSkillOrSs(ui->super2ComboBox, dep.id);
+            RemoveSkillOrSs(ui->super3ComboBox, dep.id);
+            RemoveSkillOrSs(ui->super4ComboBox, dep.id);
+            RemoveSkillOrSs(ui->ultimate1ComboBox, dep.id);
+            RemoveSkillOrSs(ui->ultimate2ComboBox, dep.id);
+            RemoveSkillOrSs(ui->evasiveComboBox, dep.id);
+            RemoveSkillOrSs(ui->blastComboBox, dep.id);
+            RemoveSkillOrSs(ui->awakenComboBox, dep.id);
 
             x2m->RemoveCharaSkillDependsAttachment(dep.guid);
             x2m->RemoveCharaSkillDepends(i);
@@ -2026,6 +2067,28 @@ bool MainWindow::Build()
     {
         while (x2m->GetNumPscEntries() != 0)
             x2m->RemovePscEntry(0);
+    }
+
+    // PSC - custom ss remove unused
+    for (size_t i = 0; i < x2m->GetNumCharaSsDepends(); i++)
+    {
+        const X2mDepends &dep = x2m->GetCharaSsDepends(i);
+
+        if (!x2m->IsCharaSsDependsReferenced(dep))
+        {
+            RemoveSkillOrSs(ui->pscSuperSoulComboBox, dep.id);
+
+            x2m->RemoveCharaSsDependsAttachment(dep.guid);
+            x2m->RemoveCharaSsDepends(i);
+            ui->pscDependsComboBox->removeItem((int)i);
+            i--;
+
+            if (ui->pscDependsComboBox->count() == 0)
+            {
+                ui->pscDependsRemoveButton->setDisabled(true);
+                ui->pscDependsUpdateButton->setDisabled(true);
+            }
+        }
     }
 
     // AUR
@@ -3488,7 +3551,7 @@ void MainWindow::FillAwakenComboBox(QComboBox *comboBox)
     }
 }
 
-void MainWindow::AddCustomSkill(QComboBox *comboBox, uint16_t id, const QString &name)
+void MainWindow::AddCustomSkillOrSs(QComboBox *comboBox, uint16_t id, const QString &name)
 {
     int index = comboBox->findData(QVariant((int16_t)id));
 
@@ -3502,7 +3565,7 @@ void MainWindow::AddCustomSkill(QComboBox *comboBox, uint16_t id, const QString 
     }
 }
 
-void MainWindow::RemoveSkill(QComboBox *comboBox, uint16_t id)
+void MainWindow::RemoveSkillOrSs(QComboBox *comboBox, uint16_t id)
 {
     int index = comboBox->findData(QVariant((int16_t)id));
 
@@ -3571,7 +3634,7 @@ void MainWindow::FillCustomSuper(QComboBox *comboBox)
 
                 if (dep)
                 {
-                    AddCustomSkill(comboBox, skill_set.char_skills[j], Utils::StdStringToQString(dep->name, false));
+                    AddCustomSkillOrSs(comboBox, skill_set.char_skills[j], Utils::StdStringToQString(dep->name, false));
                 }
             }
         }
@@ -3592,7 +3655,7 @@ void MainWindow::FillCustomUltimate(QComboBox *comboBox)
 
                 if (dep)
                 {
-                    AddCustomSkill(comboBox, skill_set.char_skills[j], Utils::StdStringToQString(dep->name, false));
+                    AddCustomSkillOrSs(comboBox, skill_set.char_skills[j], Utils::StdStringToQString(dep->name, false));
                 }
             }
         }
@@ -3611,7 +3674,7 @@ void MainWindow::FillCustomEvasive(QComboBox *comboBox)
 
             if (dep)
             {
-                AddCustomSkill(comboBox, skill_set.char_skills[6], Utils::StdStringToQString(dep->name, false));
+                AddCustomSkillOrSs(comboBox, skill_set.char_skills[6], Utils::StdStringToQString(dep->name, false));
             }
         }
     }
@@ -3629,7 +3692,7 @@ void MainWindow::FillCustomBlast(QComboBox *comboBox)
 
             if (dep)
             {
-                AddCustomSkill(comboBox, skill_set.char_skills[7], Utils::StdStringToQString(dep->name, false));
+                AddCustomSkillOrSs(comboBox, skill_set.char_skills[7], Utils::StdStringToQString(dep->name, false));
             }
         }
     }
@@ -3647,7 +3710,45 @@ void MainWindow::FillCustomAwaken(QComboBox *comboBox)
 
             if (dep)
             {
-                AddCustomSkill(comboBox, skill_set.char_skills[8], Utils::StdStringToQString(dep->name, false));
+                AddCustomSkillOrSs(comboBox, skill_set.char_skills[8], Utils::StdStringToQString(dep->name, false));
+            }
+        }
+    }
+}
+
+void MainWindow::FillSuperSoul(QComboBox *comboBox)
+{
+    const std::vector<IdbEntry> &sss = game_talisman_idb->GetEntries();
+    comboBox->addItem("[NONE]", QVariant(-1));
+
+    for (const IdbEntry &ss : sss)
+    {
+        std::string name;
+
+        if (Xenoverse2::GetTalismanName(ss.name_id, name))
+        {
+            comboBox->addItem(Utils::StdStringToQString(name, false), QVariant((int16_t)ss.id));
+        }
+        else
+        {
+            comboBox->addItem(QString("%1").arg((int16_t)ss.id), QVariant((int16_t)ss.id));
+        }
+    }
+}
+
+void MainWindow::FillCustomSuperSoul(QComboBox *comboBox)
+{
+    for (size_t i = 0; i < x2m->GetNumPscEntries(); i++)
+    {
+        const PscSpecEntry &spec = x2m->GetPscEntry(i);
+
+        if (spec.talisman >= X2M_SS_DEPENDS_BEGIN && spec.talisman < X2M_SS_DEPENDS_END)
+        {
+            X2mDepends *dep = x2m->FindCharaSsDepends(spec.talisman);
+
+            if (dep)
+            {
+                AddCustomSkillOrSs(comboBox, spec.talisman, Utils::StdStringToQString(dep->name, false));
             }
         }
     }
@@ -3667,7 +3768,21 @@ void MainWindow::EraseCustomSkills(QComboBox *comboBox)
     }
 }
 
-void MainWindow::SkillToComboBox(uint16_t id, QComboBox *comboBox, const QString &name)
+void MainWindow::EraseCustomSuperSoul(QComboBox *comboBox)
+{
+    for (int i = 0; i < comboBox->count(); i++)
+    {
+        uint16_t id = (uint16_t) (int16_t) comboBox->itemData(i).toInt();
+
+        if (id >= X2M_SS_DEPENDS_BEGIN && id < X2M_SS_DEPENDS_END)
+        {
+            comboBox->removeItem(i);;
+            i--;
+        }
+    }
+}
+
+void MainWindow::SkillOrSsToComboBox(uint16_t id, QComboBox *comboBox, const QString &name)
 {
     for (int i = 0; i < comboBox->count(); i++)
     {
@@ -3686,37 +3801,37 @@ void MainWindow::SkillToComboBox(uint16_t id, QComboBox *comboBox, const QString
 
 void MainWindow::SkillSetToGui(const CusSkillSet &entry)
 {
-    SkillToComboBox(entry.char_skills[0], ui->super1ComboBox, "Super 1");
-    SkillToComboBox(entry.char_skills[1], ui->super2ComboBox, "Super 2");
-    SkillToComboBox(entry.char_skills[2], ui->super3ComboBox, "Super 3");
-    SkillToComboBox(entry.char_skills[3], ui->super4ComboBox, "Super 4");
+    SkillOrSsToComboBox(entry.char_skills[0], ui->super1ComboBox, "Super 1");
+    SkillOrSsToComboBox(entry.char_skills[1], ui->super2ComboBox, "Super 2");
+    SkillOrSsToComboBox(entry.char_skills[2], ui->super3ComboBox, "Super 3");
+    SkillOrSsToComboBox(entry.char_skills[3], ui->super4ComboBox, "Super 4");
 
-    SkillToComboBox(entry.char_skills[4], ui->ultimate1ComboBox, "Ultimate 1");
-    SkillToComboBox(entry.char_skills[5], ui->ultimate2ComboBox, "Ultimate 2");
+    SkillOrSsToComboBox(entry.char_skills[4], ui->ultimate1ComboBox, "Ultimate 1");
+    SkillOrSsToComboBox(entry.char_skills[5], ui->ultimate2ComboBox, "Ultimate 2");
 
-    SkillToComboBox(entry.char_skills[6], ui->evasiveComboBox, "Evasive");
-    SkillToComboBox(entry.char_skills[7], ui->blastComboBox, "Blast");
-    SkillToComboBox(entry.char_skills[8], ui->awakenComboBox, "Awaken");
+    SkillOrSsToComboBox(entry.char_skills[6], ui->evasiveComboBox, "Evasive");
+    SkillOrSsToComboBox(entry.char_skills[7], ui->blastComboBox, "Blast");
+    SkillOrSsToComboBox(entry.char_skills[8], ui->awakenComboBox, "Awaken");
 }
 
-void MainWindow::ComboBoxToSkill(QComboBox *comboBox, uint16_t *skill)
+void MainWindow::ComboBoxToSkillOrSs(QComboBox *comboBox, uint16_t *skill)
 {
     *skill = (uint16_t)(uint32_t) comboBox->currentData().toInt();
 }
 
 void MainWindow::GuiToSkillSet(CusSkillSet &entry)
 {
-    ComboBoxToSkill(ui->super1ComboBox, &entry.char_skills[0]);
-    ComboBoxToSkill(ui->super2ComboBox, &entry.char_skills[1]);
-    ComboBoxToSkill(ui->super3ComboBox, &entry.char_skills[2]);
-    ComboBoxToSkill(ui->super4ComboBox, &entry.char_skills[3]);
+    ComboBoxToSkillOrSs(ui->super1ComboBox, &entry.char_skills[0]);
+    ComboBoxToSkillOrSs(ui->super2ComboBox, &entry.char_skills[1]);
+    ComboBoxToSkillOrSs(ui->super3ComboBox, &entry.char_skills[2]);
+    ComboBoxToSkillOrSs(ui->super4ComboBox, &entry.char_skills[3]);
 
-    ComboBoxToSkill(ui->ultimate1ComboBox, &entry.char_skills[4]);
-    ComboBoxToSkill(ui->ultimate2ComboBox, &entry.char_skills[5]);
+    ComboBoxToSkillOrSs(ui->ultimate1ComboBox, &entry.char_skills[4]);
+    ComboBoxToSkillOrSs(ui->ultimate2ComboBox, &entry.char_skills[5]);
 
-    ComboBoxToSkill(ui->evasiveComboBox, &entry.char_skills[6]);
-    ComboBoxToSkill(ui->blastComboBox, &entry.char_skills[7]);
-    ComboBoxToSkill(ui->awakenComboBox, &entry.char_skills[8]);
+    ComboBoxToSkillOrSs(ui->evasiveComboBox, &entry.char_skills[6]);
+    ComboBoxToSkillOrSs(ui->blastComboBox, &entry.char_skills[7]);
+    ComboBoxToSkillOrSs(ui->awakenComboBox, &entry.char_skills[8]);
 
     entry.model_preset = X2M_DUMMY_ID16;
 }
@@ -3794,38 +3909,42 @@ void MainWindow::on_cusDependsComboBox_currentIndexChanged(int index)
     // We don't really need this
 }
 
-int MainWindow::LinkOrEmbed(X2mFile *skill_x2m)
+int MainWindow::LinkOrEmbed(X2mFile *ext_x2m, bool ss)
 {
     QMessageBox box(this);
     QPushButton *link_button;
     QPushButton *embed_button;
 
-    QString text = "Do you want to link this skill mod, or embed it?";
+    QString text = (!ss) ? "Do you want to link this skill mod, or embed it?" : "Do you want to link this super soul mod, or embed it?";
 
-    if (skill_x2m)
+    if (ext_x2m)
     {
-        text += "\n\nMod name: " + Utils::StdStringToQString(skill_x2m->GetModName(), false);
-        text += "\nType: ";
+        text += "\n\nMod name: " + Utils::StdStringToQString(ext_x2m->GetModName(), false);
 
-        if (skill_x2m->GetSkillType() == X2mSkillType::SUPER)
+        if (!ss)
         {
-            text += "SUPER";
-        }
-        else if (skill_x2m->GetSkillType() == X2mSkillType::ULTIMATE)
-        {
-            text += "ULTIMATE";
-        }
-        else if (skill_x2m->GetSkillType() == X2mSkillType::EVASIVE)
-        {
-            text += "EVASIVE";
-        }
-        else if (skill_x2m->GetSkillType() == X2mSkillType::BLAST)
-        {
-            text += "BLAST";
-        }
-        else if (skill_x2m->GetSkillType() == X2mSkillType::AWAKEN)
-        {
-            text += "AWAKEN";
+            text += "\nType: ";
+
+            if (ext_x2m->GetSkillType() == X2mSkillType::SUPER)
+            {
+                text += "SUPER";
+            }
+            else if (ext_x2m->GetSkillType() == X2mSkillType::ULTIMATE)
+            {
+                text += "ULTIMATE";
+            }
+            else if (ext_x2m->GetSkillType() == X2mSkillType::EVASIVE)
+            {
+                text += "EVASIVE";
+            }
+            else if (ext_x2m->GetSkillType() == X2mSkillType::BLAST)
+            {
+                text += "BLAST";
+            }
+            else if (ext_x2m->GetSkillType() == X2mSkillType::AWAKEN)
+            {
+                text += "AWAKEN";
+            }
         }
     }
 
@@ -3882,7 +4001,7 @@ void MainWindow::on_cusDependsAddButton_clicked()
         return;
     }
 
-    int ret = LinkOrEmbed(&skill_x2m);
+    int ret = LinkOrEmbed(&skill_x2m, false);
     if (ret == 0)
         return;
 
@@ -3923,27 +4042,27 @@ void MainWindow::on_cusDependsAddButton_clicked()
 
     if (skill_x2m.GetSkillType() == X2mSkillType::SUPER)
     {
-        AddCustomSkill(ui->super1ComboBox, dep.id, mod_name);
-        AddCustomSkill(ui->super2ComboBox, dep.id, mod_name);
-        AddCustomSkill(ui->super3ComboBox, dep.id, mod_name);
-        AddCustomSkill(ui->super4ComboBox, dep.id, mod_name);
+        AddCustomSkillOrSs(ui->super1ComboBox, dep.id, mod_name);
+        AddCustomSkillOrSs(ui->super2ComboBox, dep.id, mod_name);
+        AddCustomSkillOrSs(ui->super3ComboBox, dep.id, mod_name);
+        AddCustomSkillOrSs(ui->super4ComboBox, dep.id, mod_name);
     }
     else if (skill_x2m.GetSkillType() == X2mSkillType::ULTIMATE)
     {
-        AddCustomSkill(ui->ultimate1ComboBox, dep.id, mod_name);
-        AddCustomSkill(ui->ultimate2ComboBox, dep.id, mod_name);
+        AddCustomSkillOrSs(ui->ultimate1ComboBox, dep.id, mod_name);
+        AddCustomSkillOrSs(ui->ultimate2ComboBox, dep.id, mod_name);
     }
     else if (skill_x2m.GetSkillType() == X2mSkillType::EVASIVE)
     {
-        AddCustomSkill(ui->evasiveComboBox, dep.id, mod_name);
+        AddCustomSkillOrSs(ui->evasiveComboBox, dep.id, mod_name);
     }
     else if (skill_x2m.GetSkillType() == X2mSkillType::BLAST)
     {
-        AddCustomSkill(ui->blastComboBox, dep.id, mod_name);
+        AddCustomSkillOrSs(ui->blastComboBox, dep.id, mod_name);
     }
     else if (skill_x2m.GetSkillType() == X2mSkillType::AWAKEN)
     {
-        AddCustomSkill(ui->awakenComboBox, dep.id, mod_name);
+        AddCustomSkillOrSs(ui->awakenComboBox, dep.id, mod_name);
     }
 }
 
@@ -3955,15 +4074,15 @@ void MainWindow::on_cusDependsRemoveButton_clicked()
 
     const X2mDepends &dep = x2m->GetCharaSkillDepends(idx);
 
-    RemoveSkill(ui->super1ComboBox, dep.id);
-    RemoveSkill(ui->super2ComboBox, dep.id);
-    RemoveSkill(ui->super3ComboBox, dep.id);
-    RemoveSkill(ui->super4ComboBox, dep.id);
-    RemoveSkill(ui->ultimate1ComboBox, dep.id);
-    RemoveSkill(ui->ultimate2ComboBox, dep.id);
-    RemoveSkill(ui->evasiveComboBox, dep.id);
-    RemoveSkill(ui->blastComboBox, dep.id);
-    RemoveSkill(ui->awakenComboBox, dep.id);
+    RemoveSkillOrSs(ui->super1ComboBox, dep.id);
+    RemoveSkillOrSs(ui->super2ComboBox, dep.id);
+    RemoveSkillOrSs(ui->super3ComboBox, dep.id);
+    RemoveSkillOrSs(ui->super4ComboBox, dep.id);
+    RemoveSkillOrSs(ui->ultimate1ComboBox, dep.id);
+    RemoveSkillOrSs(ui->ultimate2ComboBox, dep.id);
+    RemoveSkillOrSs(ui->evasiveComboBox, dep.id);
+    RemoveSkillOrSs(ui->blastComboBox, dep.id);
+    RemoveSkillOrSs(ui->awakenComboBox, dep.id);
 
     x2m->RemoveCharaSkillDependsAttachment(dep.guid);
     x2m->RemoveCharaSkillDepends(idx);
@@ -4019,7 +4138,7 @@ void MainWindow::on_cusDependsUpdateButton_clicked()
         return;
     }
 
-    int ret = LinkOrEmbed(nullptr);
+    int ret = LinkOrEmbed(nullptr, false);
     if (ret == 0)
         return;
 
@@ -4057,27 +4176,27 @@ void MainWindow::on_cusDependsUpdateButton_clicked()
 
         if (skill_x2m.GetSkillType() == X2mSkillType::SUPER)
         {
-            AddCustomSkill(ui->super1ComboBox, dep.id, mod_name);
-            AddCustomSkill(ui->super2ComboBox, dep.id, mod_name);
-            AddCustomSkill(ui->super3ComboBox, dep.id, mod_name);
-            AddCustomSkill(ui->super4ComboBox, dep.id, mod_name);
+            AddCustomSkillOrSs(ui->super1ComboBox, dep.id, mod_name);
+            AddCustomSkillOrSs(ui->super2ComboBox, dep.id, mod_name);
+            AddCustomSkillOrSs(ui->super3ComboBox, dep.id, mod_name);
+            AddCustomSkillOrSs(ui->super4ComboBox, dep.id, mod_name);
         }
         else if (skill_x2m.GetSkillType() == X2mSkillType::ULTIMATE)
         {
-            AddCustomSkill(ui->ultimate1ComboBox, dep.id, mod_name);
-            AddCustomSkill(ui->ultimate2ComboBox, dep.id, mod_name);
+            AddCustomSkillOrSs(ui->ultimate1ComboBox, dep.id, mod_name);
+            AddCustomSkillOrSs(ui->ultimate2ComboBox, dep.id, mod_name);
         }
         else if (skill_x2m.GetSkillType() == X2mSkillType::EVASIVE)
         {
-            AddCustomSkill(ui->evasiveComboBox, dep.id, mod_name);
+            AddCustomSkillOrSs(ui->evasiveComboBox, dep.id, mod_name);
         }
         else if (skill_x2m.GetSkillType() == X2mSkillType::BLAST)
         {
-            AddCustomSkill(ui->blastComboBox, dep.id, mod_name);
+            AddCustomSkillOrSs(ui->blastComboBox, dep.id, mod_name);
         }
         else if (skill_x2m.GetSkillType() == X2mSkillType::AWAKEN)
         {
-            AddCustomSkill(ui->awakenComboBox, dep.id, mod_name);
+            AddCustomSkillOrSs(ui->awakenComboBox, dep.id, mod_name);
         }
     }
 }
@@ -4310,7 +4429,8 @@ void MainWindow::PscEntryToGui(const PscSpecEntry &entry)
     ui->pscF8CEdit->setText(QString("%1").arg(entry.unk_8C));
     ui->pscRevivingSpeed->setText(QString("%1").arg(entry.reviving_speed));
     ui->pscU98Edit->setText(QString("%1").arg((int32_t)entry.unk_98));
-    ui->pscSuperSoulEdit->setText(QString("%1").arg((int32_t)entry.talisman));
+    SkillOrSsToComboBox((uint16_t)entry.talisman, ui->pscSuperSoulComboBox, "Super Soul");
+
     ui->pscUB8Edit->setText(QString("%1").arg((int32_t)entry.unk_B8));
     ui->pscUBCEdit->setText(QString("%1").arg((int32_t)entry.unk_BC));
     ui->pscFC0Edit->setText(QString("%1").arg(entry.unk_C0));
@@ -4357,7 +4477,11 @@ void MainWindow::GuiToPscEntry(PscSpecEntry &entry)
     entry.unk_8C = ui->pscF8CEdit->text().toFloat();
     entry.reviving_speed = ui->pscRevivingSpeed->text().toFloat();
     entry.unk_98 = (uint32_t) ui->pscU98Edit->text().toInt();
-    entry.talisman = (uint32_t) ui->pscSuperSoulEdit->text().toInt();
+
+    uint16_t talisman16;
+    ComboBoxToSkillOrSs(ui->pscSuperSoulComboBox, &talisman16);
+    entry.talisman = talisman16;
+
     entry.unk_B8 = (uint32_t) ui->pscUB8Edit->text().toInt();
     entry.unk_BC = (uint32_t) ui->pscUBCEdit->text().toInt();
     entry.unk_C0 = ui->pscFC0Edit->text().toFloat();
@@ -4406,8 +4530,7 @@ void MainWindow::on_pscCheck_clicked()
     ui->pscF8CEdit->setEnabled(checked);
     ui->pscRevivingSpeed->setEnabled(checked);
     ui->pscU98Edit->setEnabled(checked);
-    ui->pscSuperSoulEdit->setEnabled(checked);
-    ui->pscSuperSoulButton->setEnabled(checked);
+    ui->pscSuperSoulComboBox->setEnabled(checked);
     ui->pscUB8Edit->setEnabled(checked);
     ui->pscUBCEdit->setEnabled(checked);
     ui->pscFC0Edit->setEnabled(checked);
@@ -4417,6 +4540,11 @@ void MainWindow::on_pscCheck_clicked()
     ui->pscAddButton->setEnabled(checked);
     ui->pscRemoveButton->setEnabled(checked);
     ui->pscCopyButton->setEnabled(checked);
+
+    ui->pscDependsComboBox->setEnabled(checked);
+    ui->pscDependsAddButton->setEnabled(checked);
+    ui->pscDependsRemoveButton->setEnabled(checked);
+    ui->pscDependsUpdateButton->setEnabled(checked);
 
     if (checked)
     {
@@ -4443,6 +4571,12 @@ void MainWindow::on_pscCheck_clicked()
         if (num_psc_entries == 1)
         {
             ui->pscRemoveButton->setDisabled(true);
+        }
+
+        if (!x2m->HasCharaSsDepends())
+        {
+            ui->pscDependsRemoveButton->setDisabled(true);
+            ui->pscDependsUpdateButton->setDisabled(true);
         }
     }
     else
@@ -4578,43 +4712,6 @@ void MainWindow::on_pscCopyButton_triggered(QAction *arg1)
 
         if (psc != game_psc)
             delete psc;
-    }
-}
-
-void MainWindow::on_pscSuperSoulButton_clicked()
-{
-    ListDialog dialog(ListMode::TALISMAN, this);
-
-    if (!dialog.exec())
-        return;
-
-    int idx = dialog.GetResultInteger();
-
-    if (idx < 0 || idx >= game_talisman_idb->GetNumEntries())
-        return;
-
-    ui->pscSuperSoulEdit->setText(QString("%1").arg((*game_talisman_idb)[idx].id));
-}
-
-void MainWindow::on_pscSuperSoulEdit_textChanged(const QString &arg1)
-{
-    int id = arg1.toInt();
-
-    if (id < 0)
-    {
-        ui->pscSuperSoulEdit->setToolTip(QString());
-        return;
-    }
-
-    std::string name = Xenoverse2::GetTalismanNameEx(id);
-
-    if (name.length() != 0)
-    {
-        ui->pscSuperSoulEdit->setToolTip(Utils::StdStringToQString(name, false));
-    }
-    else
-    {
-        ui->pscSuperSoulEdit->setToolTip(QString());
     }
 }
 
@@ -8028,7 +8125,7 @@ void MainWindow::on_ttbLLCopyButton_triggered(QAction *arg1)
 {
     ListDialog *dialog = nullptr;
     TtbFile *ttb = nullptr;
-    bool ignore_mods = true;
+    //bool ignore_mods = true;
 
     if (arg1 == ui->actionFromGameTtb)
     {
@@ -8053,7 +8150,7 @@ void MainWindow::on_ttbLLCopyButton_triggered(QAction *arg1)
         }
 
         dialog = new ListDialog(ListMode::TTB, this, ttb);
-        ignore_mods = false;
+        //ignore_mods = false;
     }
 
     if (dialog)
@@ -9022,7 +9119,7 @@ void MainWindow::on_ttcLLCopyButton_triggered(QAction *arg1)
 {
     ListDialog *dialog = nullptr;
     TtcFile *ttc = nullptr;
-    bool ignore_mods = true;
+    //bool ignore_mods = true;
 
     if (arg1 == ui->actionFromGameTtc)
     {
@@ -9047,7 +9144,7 @@ void MainWindow::on_ttcLLCopyButton_triggered(QAction *arg1)
         }
 
         dialog = new ListDialog(ListMode::TTC, this, ttc);
-        ignore_mods = false;
+        //ignore_mods = false;
     }
 
     if (dialog)
@@ -9470,5 +9567,169 @@ void MainWindow::on_aurBpeButton_triggered(QAction *arg1)
 
         ui->auraBpeEdit->setText(ns);
     }
+}
+
+
+void MainWindow::on_pscDependsAddButton_clicked()
+{
+    QString file = QFileDialog::getOpenFileName(this, "Select skill x2m", config.lf_depends_ss, "X2M Files (*.x2m)");
+
+    if (file.isNull())
+        return;
+
+    config.lf_depends_ss = file;
+
+    X2mFile ss_x2m;
+
+    if (!ss_x2m.LoadFromFile(Utils::QStringToStdString(file)))
+    {
+        DPRINTF("Failed to load x2m.\n");
+        return;
+    }
+
+    if (ss_x2m.GetType() != X2mType::NEW_SUPERSOUL)
+    {
+        DPRINTF("That x2m is not of new super soul type!\n");
+        return;
+    }
+
+    if (x2m->CharaSsDependsExist(ss_x2m.GetModGuid()))
+    {
+        DPRINTF("That supersoul is already linked or embedded. Use the \"update\" button if you want to update it.");
+        return;
+    }
+
+    int ret = LinkOrEmbed(&ss_x2m, true);
+    if (ret == 0)
+        return;
+
+    if (!x2m->AddCharaSsDepends(&ss_x2m, false))
+    {
+        DPRINTF("Internal error when adding data.\n");
+        return;
+    }
+
+    QString text;
+
+    if (ret > 0)
+    {
+        if (!x2m->SetCharaSsDependsAttachment(&ss_x2m))
+        {
+            DPRINTF("Failed to attach the super soul.\n");
+            x2m->RemoveCharaSsDepends(ss_x2m.GetModGuid());
+            return;
+        }
+
+        text += "[EMBEDDED] ";
+    }
+    else
+    {
+        text += "[LINKED] ";
+    }
+
+    QString mod_name = Utils::StdStringToQString(ss_x2m.GetModName(), false);
+
+    text += mod_name;
+    ui->pscDependsComboBox->addItem(text);
+    ui->pscDependsComboBox->setCurrentIndex(ui->pscDependsComboBox->count()-1);
+
+    ui->pscDependsRemoveButton->setEnabled(true);
+    ui->pscDependsUpdateButton->setEnabled(true);
+
+    const X2mDepends &dep = x2m->GetCharaSsDepends(x2m->GetNumCharaSsDepends()-1);
+    AddCustomSkillOrSs(ui->pscSuperSoulComboBox, dep.id, mod_name);
+}
+
+
+void MainWindow::on_pscDependsRemoveButton_clicked()
+{
+    int idx = ui->pscDependsComboBox->currentIndex();
+    if (idx < 0 || idx >= x2m->GetNumCharaSsDepends())
+        return;
+
+    const X2mDepends &dep = x2m->GetCharaSsDepends(idx);
+    RemoveSkillOrSs(ui->pscSuperSoulComboBox, dep.id);
+
+    x2m->RemoveCharaSsDependsAttachment(dep.guid);
+    x2m->RemoveCharaSsDepends(idx);
+    ui->pscDependsComboBox->removeItem(idx);
+
+    if (x2m->GetNumCharaSsDepends() == 0)
+    {
+        ui->pscDependsRemoveButton->setDisabled(true);
+        ui->pscDependsUpdateButton->setDisabled(true);
+    }
+}
+
+
+void MainWindow::on_pscDependsUpdateButton_clicked()
+{
+    int idx = ui->pscDependsComboBox->currentIndex();
+    if (idx < 0 || idx >= x2m->GetNumCharaSsDepends())
+        return;
+
+    QString file = QFileDialog::getOpenFileName(this, "Select skill x2m", config.lf_depends_ss, "X2M Files (*.x2m)");
+
+    if (file.isNull())
+        return;
+
+    config.lf_depends_ss = file;
+
+    X2mFile ss_x2m;
+
+    if (!ss_x2m.LoadFromFile(Utils::QStringToStdString(file)))
+    {
+        DPRINTF("Failed to load x2m.\n");
+        return;
+    }
+
+    if (ss_x2m.GetType() != X2mType::NEW_SUPERSOUL)
+    {
+        DPRINTF("That x2m is not of new super soul type!\n");
+        return;
+    }
+
+    if (!x2m->CharaSsDependsExist(ss_x2m.GetModGuid()))
+    {
+        DPRINTF("The selected x2m is not an update of this super soul.\nTo add a new super soul, use the Add button instead.\n");
+        return;
+    }
+
+    int ret = LinkOrEmbed(nullptr, false);
+    if (ret == 0)
+        return;
+
+    if (!x2m->AddCharaSsDepends(&ss_x2m, true))
+    {
+        DPRINTF("Internal error when setting data.\n");
+        return;
+    }
+
+    QString text;
+
+    if (ret > 0)
+    {
+        if (!x2m->SetCharaSsDependsAttachment(&ss_x2m))
+        {
+            DPRINTF("Failed to attach the super soul.\n");
+            return;
+        }
+
+        text += "[EMBEDDED] ";
+    }
+    else
+    {
+        x2m->RemoveCharaSsDependsAttachment(ss_x2m.GetModGuid());
+        text += "[LINKED] ";
+    }
+
+    QString mod_name = Utils::StdStringToQString(ss_x2m.GetModName(), false);
+
+    text += mod_name;
+    ui->pscDependsComboBox->setItemText(idx, text);
+
+    const X2mDepends &dep = x2m->GetCharaSsDepends(idx);
+    AddCustomSkillOrSs(ui->pscSuperSoulComboBox, dep.id, mod_name);
+
 }
 

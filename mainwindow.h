@@ -110,11 +110,7 @@ private slots:
 
     void on_pscRemoveButton_clicked();
 
-    void on_pscCopyButton_triggered(QAction *arg1);
-
-    void on_pscSuperSoulButton_clicked();
-
-    void on_pscSuperSoulEdit_textChanged(const QString &arg1);
+    void on_pscCopyButton_triggered(QAction *arg1);    
 
     void on_aurCheck_clicked();
 
@@ -278,6 +274,12 @@ private slots:
 
     void on_aurBpeButton_triggered(QAction *arg1);
 
+    void on_pscDependsAddButton_clicked();
+
+    void on_pscDependsRemoveButton_clicked();
+
+    void on_pscDependsUpdateButton_clicked();
+
 protected:
     void closeEvent(QCloseEvent *event);
 
@@ -330,9 +332,9 @@ private:
     void CmsEntryToGui(const CmsEntryXV2 &entry);
     void GuiToCmsEntry(CmsEntryXV2 &entry);
 
-    void SkillToComboBox(uint16_t id, QComboBox *comboBox, const QString &name);
+    void SkillOrSsToComboBox(uint16_t id, QComboBox *comboBox, const QString &name);
     void SkillSetToGui(const CusSkillSet &entry);
-    void ComboBoxToSkill(QComboBox *comboBox, uint16_t *skill);
+    void ComboBoxToSkillOrSs(QComboBox *comboBox, uint16_t *skill);
     void GuiToSkillSet(CusSkillSet &entry);
 
     void FillSuperComboBox(QComboBox *comboBox);
@@ -341,8 +343,8 @@ private:
     void FillBlastComboBox(QComboBox *comboBox);
     void FillAwakenComboBox(QComboBox *comboBox);
 
-    void AddCustomSkill(QComboBox *comboBox, uint16_t id, const QString &name);
-    void RemoveSkill(QComboBox *comboBox, uint16_t id);
+    void AddCustomSkillOrSs(QComboBox *comboBox, uint16_t id, const QString &name);
+    void RemoveSkillOrSs(QComboBox *comboBox, uint16_t id);
 
     bool FindCustomSkillType(uint16_t id, X2mSkillType *type);
 
@@ -352,9 +354,13 @@ private:
     void FillCustomBlast(QComboBox *comboBox);
     void FillCustomAwaken(QComboBox *comboBox);
 
-    void EraseCustomSkills(QComboBox *comboBox);
+    void FillSuperSoul(QComboBox *comboBox);
+    void FillCustomSuperSoul(QComboBox *comboBox);
 
-    int LinkOrEmbed(X2mFile *skill_x2m);
+    void EraseCustomSkills(QComboBox *comboBox);
+    void EraseCustomSuperSoul(QComboBox *comboBox);
+
+    int LinkOrEmbed(X2mFile *ext_x2m, bool ss);
 
     void CsoEntryToGui(const CsoEntry& entry);
     void GuiToCsoEntry(CsoEntry &entry);
