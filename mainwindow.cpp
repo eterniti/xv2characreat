@@ -247,6 +247,21 @@ bool MainWindow::Initialize()
     ui->cncModelPresetEdit->setValidator(new QIntValidator(0,32767, this));
     ui->cncCopyButton->addAction(ui->actionFromGameCnc);
     ui->cncCopyButton->addAction(ui->actionFromExternalCnc);
+    // Ikd tab
+    ui->ikdU34Edit->setValidator(new QIntValidator(this));
+    ui->ikdU38Edit->setValidator(new QIntValidator(this));
+    ui->ikdCopyButton->addAction(ui->actionFromGameIkdBattle);
+    ui->ikdCopyButton->addAction(ui->actionFromGameIkdLobby);
+    ui->ikdCopyButton->addAction(ui->actionFromExternalIkd);
+    // Vlc tab
+    ui->vlcXEdit->setValidator(new QDoubleValidator(this));
+    ui->vlcYEdit->setValidator(new QDoubleValidator(this));
+    ui->vlcZEdit->setValidator(new QDoubleValidator(this));
+    ui->vlcX2Edit->setValidator(new QDoubleValidator(this));
+    ui->vlcY2Edit->setValidator(new QDoubleValidator(this));
+    ui->vlcZ2Edit->setValidator(new QDoubleValidator(this));
+    ui->vlcCopyButton->addAction(ui->actionFromGameVlc);
+    ui->vlcCopyButton->addAction(ui->actionFromExternalVlc);
 
     set_debug_level(2);
     QDir::setCurrent(qApp->applicationDirPath());
@@ -424,6 +439,7 @@ void MainWindow::ProcessX2m()
     on_multNamesCheck_clicked();
 
     ui->canUseAnyDualSkillCheck->setChecked(x2m->CanUseAnyDualSkill());
+    ui->invisibleCheck->setChecked(x2m->IsInvisible());
 
     // Files tab
     if (x2m->CharaDirectoryExists())
@@ -820,6 +836,30 @@ void MainWindow::ProcessX2m()
 
     // Vfx tab
     ui->vfxEdit->setText(Utils::StdStringToQString(x2m->GetCharEepk()));
+
+    // Ikd tab
+    if (x2m->HasIkd())
+    {
+        ui->ikdCheck->setChecked(true);
+        ui->ikdLobbyCheck->setChecked(x2m->HasIkdLobby());
+    }
+    else
+    {
+        ui->ikdCheck->setChecked(false);
+        ui->ikdLobbyCheck->setChecked(false);
+    }
+
+    // Put dummy entry to gui
+    IkdEntry ikd_entry;
+    IkdEntryToGui(ikd_entry);
+
+    x2m->EnableIkdLobby(false);
+    on_ikdCheck_clicked();
+
+    // Vlc tab
+    ui->vlcCheck->setChecked(x2m->HasVlc());
+    VlcEntryToGui(x2m->GetVlcEntry());
+    on_vlcCheck_clicked();
 
     // Update to new format
     x2m->SetFormatVersion(x2m->X2M_CURRENT_VERSION);
@@ -1644,6 +1684,35 @@ check_myself:
         }
     }
 
+    // IKD
+    if (ui->ikdCheck->isChecked())
+    {
+        size_t num_ikd = x2m->GetNumIkdEntries();
+        if (num_ikd != costumes.size())
+        {
+            DPRINTF("[IKD] Number of ikd entries is not equal to number of different costume_index in slot section.\n\n"
+                    "Number of ikd entries = %Id, number of different costume_index = %Id\n", num_ikd, costumes.size());
+            return false;
+        }
+
+        if (ui->ikdU34Edit->text().isEmpty() || ui->ikdU38Edit->text().isEmpty() || ui->ikdFloatData->text().isEmpty())
+        {
+            DPRINTF("[IKD] No fields in cml tab can be empty.\n");
+            return false;
+        }
+    }
+
+    // VLC
+    if (ui->vlcCheck->isChecked())
+    {
+        if (ui->vlcXEdit->text().isEmpty() || ui->vlcYEdit->text().isEmpty() || ui->vlcZEdit->text().isEmpty() ||
+            ui->vlcX2Edit->text().isEmpty() || ui->vlcY2Edit->text().isEmpty() || ui->vlcZ2Edit->text().isEmpty())
+        {
+            DPRINTF("[VLC] No fields in cml tab can be empty.\n");
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -1717,6 +1786,7 @@ bool MainWindow::Build()
     }
 
     x2m->SetCanUseAnyDualSkill(ui->canUseAnyDualSkillCheck->isChecked());
+    x2m->SetInvisible(ui->invisibleCheck->isChecked());
 
     // Files
     QString chara_files = ui->charaFilesEdit->text().trimmed();
@@ -2229,6 +2299,38 @@ bool MainWindow::Build()
 
     // VFX
     x2m->SetCharEepk(Utils::QStringToStdString(ui->vfxEdit->text().trimmed(), false));
+
+    // IKD
+    x2m->EnableIkdLobby(false);
+
+    if (ui->ikdCheck->isChecked())
+    {
+        // We only need to set up current slot, rest preformed by combobox event
+        int ikd_idx = ui->ikdCostComboBox->currentIndex();
+        if (ikd_idx < 0 || ikd_idx >= x2m->GetNumIkdEntries())
+        {
+            DPRINTF("%s: ikd entry ComboBox index out of bounds.\n", FUNCNAME);
+            return false;
+        }
+
+        IkdEntry &entry = x2m->GetIkdEntry(ikd_idx, false);
+        GuiToIkdEntry(entry);
+
+        if (ui->ikdLobbyCheck->isChecked())
+            x2m->EnableIkdLobby(true);
+    }
+    else
+    {
+        while (x2m->GetNumIkdEntries() != 0)
+            x2m->RemoveIkdEntry(0, false);
+    }
+
+    // VLC
+    x2m->EnableVlc(ui->vlcCheck->isChecked());
+    if (x2m->HasVlc())
+    {
+        GuiToVlcEntry(x2m->GetVlcEntry());
+    }
 
     return true;
 }
@@ -9731,5 +9833,314 @@ void MainWindow::on_pscDependsUpdateButton_clicked()
     const X2mDepends &dep = x2m->GetCharaSsDepends(idx);
     AddCustomSkillOrSs(ui->pscSuperSoulComboBox, dep.id, mod_name);
 
+}
+
+QString MainWindow::FloatsToString(const float *arr, size_t num)
+{
+    std::string ret;
+    for (size_t i = 0; i < num; i++)
+    {
+        ret += Utils::FloatToString(arr[i]);
+        if (i != (num-1))
+            ret += ", ";
+    }
+
+    return Utils::StdStringToQString(ret, false);
+}
+
+bool MainWindow::StringToFloats(const QString &str, float *arr, size_t capacity)
+{
+    memset(arr, 0, capacity*sizeof(float));
+
+    std::vector<std::string> fstrs;
+    if (Utils::GetMultipleStrings(Utils::QStringToStdString(str, false), fstrs) > 0)
+    {
+        size_t count = fstrs.size();
+        if (count > capacity)
+            count = capacity;
+
+        for (size_t i = 0; i < count; i++)
+        {
+            arr[i] = Utils::GetFloat(fstrs[i]);
+        }
+
+        return (fstrs.size() == capacity);
+    }
+
+    return false;
+}
+
+void MainWindow::IkdEntryToGui(const IkdEntry &entry)
+{
+    ui->ikdU34Edit->setText(QString("%1").arg((int32_t)entry.unk_34));
+    ui->ikdU38Edit->setText(QString("%1").arg((int32_t)entry.unk_38));
+    ui->ikdFloatData->setText(FloatsToString(entry.unk_08, 12));
+}
+
+void MainWindow::GuiToIkdEntry(IkdEntry &entry)
+{
+    entry.unk_34 = (uint32_t) ui->ikdU34Edit->text().toInt();
+    entry.unk_38 = (uint32_t) ui->ikdU38Edit->text().toInt();
+    StringToFloats(ui->ikdFloatData->text(), entry.unk_08, 12);
+}
+
+void MainWindow::VlcEntryToGui(const VlcEntry &entry)
+{
+    ui->vlcXEdit->setText(QString("%1").arg(entry.x));
+    ui->vlcYEdit->setText(QString("%1").arg(entry.y));
+    ui->vlcZEdit->setText(QString("%1").arg(entry.z));
+    ui->vlcX2Edit->setText(QString("%1").arg(entry.x2));
+    ui->vlcY2Edit->setText(QString("%1").arg(entry.y2));
+    ui->vlcZ2Edit->setText(QString("%1").arg(entry.z2));
+}
+
+void MainWindow::GuiToVlcEntry(VlcEntry &entry)
+{
+    entry.x = ui->vlcXEdit->text().toFloat();
+    entry.y = ui->vlcYEdit->text().toFloat();
+    entry.z = ui->vlcZEdit->text().toFloat();
+    entry.x2 = ui->vlcX2Edit->text().toFloat();
+    entry.y2 = ui->vlcY2Edit->text().toFloat();
+    entry.z2 = ui->vlcZ2Edit->text().toFloat();
+}
+
+void MainWindow::on_ikdCheck_clicked()
+{
+    bool checked = ui->ikdCheck->isChecked();
+
+    ui->ikdU34Edit->setEnabled(checked);
+    ui->ikdU38Edit->setEnabled(checked);
+    ui->ikdFloatData->setEnabled(checked);
+    ui->ikdLobbyCheck->setEnabled(checked);
+
+    ui->ikdAddButton->setEnabled(checked);
+    ui->ikdRemoveButton->setEnabled(checked);
+    ui->ikdCopyButton->setEnabled(checked);
+    ui->ikdCostComboBox->setEnabled(checked);
+
+    if (checked)
+    {
+        // Clear combobox first
+        prev_ikd_index = -1;
+        ui->ikdCostComboBox->clear();
+
+        size_t num_ikd_entries = x2m->GetNumIkdEntries();
+
+        if (num_ikd_entries == 0)
+        {
+            IkdEntry entry;
+
+            GuiToIkdEntry(entry);
+            x2m->AddIkdEntry(entry);
+            num_ikd_entries++;
+        }
+
+        for (size_t i = 0; i < num_ikd_entries; i++)
+        {
+            ui->ikdCostComboBox->addItem(QString("Entry %1").arg(i));
+        }
+
+        if (num_ikd_entries == 1)
+        {
+            ui->ikdRemoveButton->setDisabled(true);
+        }
+    }
+    else
+    {
+        x2m->EnableIkdLobby(false);
+
+        while (x2m->GetNumIkdEntries() != 0)
+            x2m->RemoveIkdEntry(0, false);
+    }
+}
+
+
+void MainWindow::on_ikdCostComboBox_currentIndexChanged(int index)
+{
+    if (index < 0 || index >= x2m->GetNumIkdEntries())
+        return;
+
+    if (prev_ikd_index >= 0 && prev_ikd_index < x2m->GetNumIkdEntries())
+    {
+        IkdEntry &entry = x2m->GetIkdEntry(prev_ikd_index, false);
+        GuiToIkdEntry(entry);
+    }
+
+    const IkdEntry &entry = x2m->GetIkdEntry(index, false);
+    IkdEntryToGui(entry);
+
+    prev_ikd_index = index;
+}
+
+
+void MainWindow::on_ikdAddButton_clicked()
+{
+    IkdEntry entry;
+
+    int idx = ui->ikdCostComboBox->currentIndex();
+    if (idx >= 0 && idx < x2m->GetNumIkdEntries())
+    {
+        GuiToIkdEntry(entry);
+    }
+
+    size_t pos = x2m->AddIkdEntry(entry);
+
+    ui->ikdCostComboBox->addItem(QString("Entry %1").arg(pos));
+
+    if (x2m->GetNumIkdEntries() == XV2_MAX_SUBSLOTS)
+        ui->ikdAddButton->setDisabled(true);
+
+    ui->ikdCostComboBox->setCurrentIndex((int)pos);
+
+    if (x2m->GetNumIkdEntries() > 1)
+        ui->ikdRemoveButton->setEnabled(true);
+}
+
+
+void MainWindow::on_ikdRemoveButton_clicked()
+{
+    int index = ui->ikdCostComboBox->currentIndex();
+
+    if (index < 0 || index >= x2m->GetNumIkdEntries())
+        return;
+
+    x2m->RemoveIkdEntry(index, false);
+
+    if (prev_ikd_index > index)
+        prev_ikd_index--;
+    else
+        prev_ikd_index = -1;
+
+    ui->ikdCostComboBox->removeItem(index);
+
+    for (int i = 0; i < ui->ikdCostComboBox->count(); i++)
+    {
+        ui->ikdCostComboBox->setItemText(i, QString("Entry %1").arg(i));
+    }
+
+    if (x2m->GetNumIkdEntries() == 1)
+        ui->ikdRemoveButton->setDisabled(true);
+
+    else if (x2m->GetNumIkdEntries() < XV2_MAX_SUBSLOTS)
+        ui->ikdAddButton->setEnabled(true);
+}
+
+void MainWindow::on_ikdCopyButton_triggered(QAction *arg1)
+{
+    ListDialog *dialog = nullptr;
+    IkdFile *ikd = nullptr;
+
+    if (arg1 == ui->actionFromGameIkdBattle)
+    {
+        dialog = new ListDialog(ListMode::IKD, this);
+        ikd = game_ikd_battle;
+    }
+    else if (arg1 == ui->actionFromGameIkdLobby)
+    {
+        dialog = new ListDialog(ListMode::IKD, this, nullptr, IKD_FLAG_LOBBY);
+        ikd = game_ikd_lobby;
+    }
+    else if (arg1 == ui->actionFromExternalIkd)
+    {
+        QString file = QFileDialog::getOpenFileName(this, "External IKD", config.lf_external_ikd, "IKD Files (*.ikd *.ikd.xml)");
+
+        if (file.isNull())
+            return;
+
+        config.lf_external_ikd = file;
+
+        ikd = new IkdFile();
+        if (!ikd->SmartLoad(Utils::QStringToStdString(file)))
+        {
+            DPRINTF("Failed loading file.");
+            delete ikd;
+            return;
+        }
+
+        dialog = new ListDialog(ListMode::IKD, this, ikd);
+    }
+
+    if (dialog)
+    {
+        if (dialog->exec())
+        {
+            int idx = dialog->GetResultInteger();
+
+            if (idx >= 0 && idx < ikd->GetNumEntries())
+            {
+                const IkdEntry &entry = (*ikd)[idx];
+                IkdEntryToGui(entry);
+            }
+        }
+
+        delete dialog;
+
+        if (ikd != game_ikd_battle && ikd != game_ikd_lobby)
+            delete ikd;
+    }
+}
+
+void MainWindow::on_vlcCheck_clicked()
+{
+    bool checked = ui->vlcCheck->isChecked();
+
+    ui->vlcXEdit->setEnabled(checked);
+    ui->vlcYEdit->setEnabled(checked);
+    ui->vlcZEdit->setEnabled(checked);
+    ui->vlcX2Edit->setEnabled(checked);
+    ui->vlcY2Edit->setEnabled(checked);
+    ui->vlcZ2Edit->setEnabled(checked);
+    ui->vlcCopyButton->setEnabled(checked);
+}
+
+
+void MainWindow::on_vlcCopyButton_triggered(QAction *arg1)
+{
+    ListDialog *dialog = nullptr;
+    VlcFile *vlc = nullptr;
+
+    if (arg1 == ui->actionFromGameVlc)
+    {
+        dialog = new ListDialog(ListMode::VLC, this);
+        vlc = game_vlc;
+    }
+    else if (arg1 == ui->actionFromExternalVlc)
+    {
+        QString file = QFileDialog::getOpenFileName(this, "External VLC", config.lf_external_vlc, "VLC Files (*.vlc *.vlc.xml)");
+
+        if (file.isNull())
+            return;
+
+        config.lf_external_vlc = file;
+
+        vlc = new VlcFile();
+        if (!vlc->SmartLoad(Utils::QStringToStdString(file)))
+        {
+            DPRINTF("Failed loading file.");
+            delete vlc;
+            return;
+        }
+
+        dialog = new ListDialog(ListMode::CML, this, vlc);
+    }
+
+    if (dialog)
+    {
+        if (dialog->exec())
+        {
+            int idx = dialog->GetResultInteger();
+
+            if (idx >= 0 && idx < vlc->GetNumEntries())
+            {
+                const VlcEntry &entry = (*vlc)[idx];
+                VlcEntryToGui(entry);
+            }
+        }
+
+        delete dialog;
+
+        if (vlc != game_vlc)
+            delete vlc;
+    }
 }
 

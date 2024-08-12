@@ -280,6 +280,20 @@ private slots:
 
     void on_pscDependsUpdateButton_clicked();
 
+    void on_ikdCheck_clicked();
+
+    void on_ikdCostComboBox_currentIndexChanged(int index);
+
+    void on_ikdAddButton_clicked();
+
+    void on_ikdRemoveButton_clicked();
+
+    void on_ikdCopyButton_triggered(QAction *arg1);
+
+    void on_vlcCheck_clicked();
+
+    void on_vlcCopyButton_triggered(QAction *arg1);
+
 protected:
     void closeEvent(QCloseEvent *event);
 
@@ -307,6 +321,7 @@ private:
     int prev_ttchl_cost_index=-1;
     int prev_ttcll_cost_index=-1;
     int prev_cnc_index=-1;
+    int prev_ikd_index=-1;
 
     bool audio_playing=false;
     bool show_wait_onsave=false;
@@ -435,6 +450,15 @@ private:
 
     void CncEntryToGui(const CncEntry &entry);
     void GuiToCncEntry(CncEntry &entry);
+
+    QString FloatsToString(const float *arr, size_t num);
+    bool StringToFloats(const QString &str, float *arr, size_t capacity);
+
+    void IkdEntryToGui(const IkdEntry &entry);
+    void GuiToIkdEntry(IkdEntry &entry);
+
+    void VlcEntryToGui(const VlcEntry &entry);
+    void GuiToVlcEntry(VlcEntry &entry);
 };
 
 #endif // MAINWINDOW_H

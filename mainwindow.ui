@@ -23,6 +23,9 @@
       <height>616</height>
      </rect>
     </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
     <property name="currentIndex">
      <number>0</number>
     </property>
@@ -553,6 +556,19 @@
         <string>Cell Max</string>
        </property>
       </item>
+     </widget>
+     <widget class="QCheckBox" name="invisibleCheck">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>450</y>
+        <width>741</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Do not install on CSS</string>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="filesTab">
@@ -6391,6 +6407,342 @@
       </property>
      </widget>
     </widget>
+    <widget class="QWidget" name="ikdTab">
+     <property name="autoFillBackground">
+      <bool>true</bool>
+     </property>
+     <attribute name="title">
+      <string>IKD</string>
+     </attribute>
+     <widget class="QComboBox" name="ikdCostComboBox">
+      <property name="geometry">
+       <rect>
+        <x>420</x>
+        <y>20</y>
+        <width>115</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="ikdRemoveButton">
+      <property name="geometry">
+       <rect>
+        <x>630</x>
+        <y>20</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Remove</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="ikdAddButton">
+      <property name="geometry">
+       <rect>
+        <x>550</x>
+        <y>20</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Add</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="ikdCheck">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>20</y>
+        <width>121</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Enable IKD</string>
+      </property>
+     </widget>
+     <widget class="QToolButton" name="ikdCopyButton">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>60</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Copy</string>
+      </property>
+      <property name="popupMode">
+       <enum>QToolButton::InstantPopup</enum>
+      </property>
+      <property name="toolButtonStyle">
+       <enum>Qt::ToolButtonTextOnly</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_174">
+      <property name="geometry">
+       <rect>
+        <x>32</x>
+        <y>110</y>
+        <width>47</width>
+        <height>13</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>U_34:</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="ikdU34Edit">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>108</y>
+        <width>111</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_175">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>110</y>
+        <width>47</width>
+        <height>13</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>U_38:</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="ikdU38Edit">
+      <property name="geometry">
+       <rect>
+        <x>458</x>
+        <y>108</y>
+        <width>111</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_176">
+      <property name="geometry">
+       <rect>
+        <x>6</x>
+        <y>150</y>
+        <width>61</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Float data:</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="ikdFloatData">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>148</y>
+        <width>741</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="ikdLobbyCheck">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>220</y>
+        <width>741</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Enable lobby. Use this if you plan on making the character appear on lobby somehow. (This setting is global for all costumes)</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="vlcTab">
+     <property name="autoFillBackground">
+      <bool>true</bool>
+     </property>
+     <attribute name="title">
+      <string>VLC</string>
+     </attribute>
+     <widget class="QCheckBox" name="vlcCheck">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>20</y>
+        <width>121</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Enable VLC</string>
+      </property>
+     </widget>
+     <widget class="QToolButton" name="vlcCopyButton">
+      <property name="geometry">
+       <rect>
+        <x>630</x>
+        <y>20</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Copy</string>
+      </property>
+      <property name="popupMode">
+       <enum>QToolButton::InstantPopup</enum>
+      </property>
+      <property name="toolButtonStyle">
+       <enum>Qt::ToolButtonTextOnly</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_177">
+      <property name="geometry">
+       <rect>
+        <x>556</x>
+        <y>60</y>
+        <width>41</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Z:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_178">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>90</y>
+        <width>41</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>X2:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_179">
+      <property name="geometry">
+       <rect>
+        <x>556</x>
+        <y>90</y>
+        <width>41</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Z2:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_180">
+      <property name="geometry">
+       <rect>
+        <x>323</x>
+        <y>60</y>
+        <width>41</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Y:</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="vlcYEdit">
+      <property name="geometry">
+       <rect>
+        <x>367</x>
+        <y>58</y>
+        <width>111</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="vlcZEdit">
+      <property name="geometry">
+       <rect>
+        <x>600</x>
+        <y>58</y>
+        <width>111</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="vlcY2Edit">
+      <property name="geometry">
+       <rect>
+        <x>367</x>
+        <y>88</y>
+        <width>111</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="vlcXEdit">
+      <property name="geometry">
+       <rect>
+        <x>134</x>
+        <y>58</y>
+        <width>111</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="vlcZ2Edit">
+      <property name="geometry">
+       <rect>
+        <x>600</x>
+        <y>88</y>
+        <width>111</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="vlcX2Edit">
+      <property name="geometry">
+       <rect>
+        <x>134</x>
+        <y>88</y>
+        <width>111</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_181">
+      <property name="geometry">
+       <rect>
+        <x>323</x>
+        <y>90</y>
+        <width>41</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Y2:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_182">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>60</y>
+        <width>41</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>X:</string>
+      </property>
+     </widget>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -6794,6 +7146,43 @@
   <action name="actionFromCmnBpeBO">
    <property name="text">
     <string>From cmn.bpe (only BodyOutline)</string>
+   </property>
+  </action>
+  <action name="actionFromGameIkdBattle">
+   <property name="text">
+    <string>From game (battle)</string>
+   </property>
+   <property name="toolTip">
+    <string>From game (battle)</string>
+   </property>
+  </action>
+  <action name="actionFromGameIkdLobby">
+   <property name="text">
+    <string>From game (lobby)</string>
+   </property>
+  </action>
+  <action name="actionFromExternalIkd">
+   <property name="text">
+    <string>From external IKD</string>
+   </property>
+   <property name="toolTip">
+    <string>From external IKD</string>
+   </property>
+  </action>
+  <action name="actionFromGameVlc">
+   <property name="text">
+    <string>From game</string>
+   </property>
+   <property name="toolTip">
+    <string>From game</string>
+   </property>
+  </action>
+  <action name="actionFromExternalVlc">
+   <property name="text">
+    <string>From external VLC</string>
+   </property>
+   <property name="toolTip">
+    <string>From external VLC</string>
    </property>
   </action>
  </widget>
