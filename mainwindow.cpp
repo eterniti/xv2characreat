@@ -10121,7 +10121,7 @@ void MainWindow::on_vlcCopyButton_triggered(QAction *arg1)
             return;
         }
 
-        dialog = new ListDialog(ListMode::CML, this, vlc);
+        dialog = new ListDialog(ListMode::VLC, this, vlc);
     }
 
     if (dialog)
