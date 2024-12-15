@@ -8,6 +8,7 @@
 #include <QAudioDeviceInfo>
 #include <QBuffer>
 #include <QAudioOutput>
+#include <QStyleFactory>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -262,11 +263,17 @@ bool MainWindow::Initialize()
     ui->vlcZ2Edit->setValidator(new QDoubleValidator(this));
     ui->vlcCopyButton->addAction(ui->actionFromGameVlc);
     ui->vlcCopyButton->addAction(ui->actionFromExternalVlc);
+    // Destruction tab
+    ui->desDamageEdit->setValidator(new QIntValidator(this));
+    ui->desTimeEdit->setValidator(new QIntValidator(this));
 
     set_debug_level(2);
     QDir::setCurrent(qApp->applicationDirPath());
 
     Bootstrap(true, false);
+
+    if (config.dark_theme)
+        ToggleDarkTheme(false);
 
     // Cus tab (post)
     FillSuperComboBox(ui->super1ComboBox);
@@ -860,6 +867,22 @@ void MainWindow::ProcessX2m()
     ui->vlcCheck->setChecked(x2m->HasVlc());
     VlcEntryToGui(x2m->GetVlcEntry());
     on_vlcCheck_clicked();
+
+    // Destruction tab
+    if (x2m->HasDestruction())
+    {
+        ui->desCheck->setChecked(true);
+    }
+    else
+    {
+        ui->desCheck->setChecked(false);
+    }
+
+    // Put dummy entry to gui
+    DestructionLevel dl;
+    DestructionLevelToGui(dl);
+
+    on_desCheck_clicked();
 
     // Update to new format
     x2m->SetFormatVersion(x2m->X2M_CURRENT_VERSION);
@@ -1713,6 +1736,30 @@ check_myself:
         }
     }
 
+    // Destruction
+    if (ui->desCheck->isChecked())
+    {
+        if (ui->desStateInEdit->text().isEmpty() || ui->desStateOutEdit->text().isEmpty() || ui->desDamageEdit->text().isEmpty() ||
+            ui->desTimeEdit->text().isEmpty())
+        {
+            DPRINTF("[Destruction] No fields in Destruction tab can be empty.\n");
+            return false;
+        }
+
+        int idx = ui->desComboBox->currentIndex();
+        if (idx >= 0 && idx < x2m->GetNumDestructionStages())
+            GuiToDestructionLevel(x2m->GetDestructionStage((size_t)idx));
+
+        for (size_t i = 0; i < x2m->GetNumDestructionStages(); i++)
+        {
+            if (!x2m->GetDestructionStage(i).CompileMap(nullptr))
+            {
+                DPRINTF("The previous error happened because of incorrect data in the Destruction tab.\n");
+                return false;
+            }
+        }
+    }
+
     return true;
 }
 
@@ -2330,6 +2377,26 @@ bool MainWindow::Build()
     if (x2m->HasVlc())
     {
         GuiToVlcEntry(x2m->GetVlcEntry());
+    }
+
+    // Destruction
+    if (ui->desCheck->isChecked())
+    {
+        // We only need to set up current slot, rest preformed by combobox event
+        int des_idx = ui->desComboBox->currentIndex();
+        if (des_idx < 0 || des_idx >= x2m->GetNumDestructionStages())
+        {
+            DPRINTF("%s: desComboBox index out of bounds.\n", FUNCNAME);
+            return false;
+        }
+
+        DestructionLevel &dl = x2m->GetDestructionStage(des_idx);
+        GuiToDestructionLevel(dl);
+    }
+    else
+    {
+        while (x2m->GetNumDestructionStages() != 0)
+            x2m->RemoveDestructionStage(0);
     }
 
     return true;
@@ -9904,6 +9971,69 @@ void MainWindow::GuiToVlcEntry(VlcEntry &entry)
     entry.z2 = ui->vlcZ2Edit->text().toFloat();
 }
 
+void MainWindow::DestructionLevelToGui(const DestructionLevel &dl)
+{
+    ui->desStateInEdit->setText(Utils::StdStringToQString(dl.map_in, false));
+    ui->desStateOutEdit->setText(Utils::StdStringToQString(dl.map_out, false));
+    ui->desDamageEdit->setText(QString("%1").arg(dl.damage));
+    ui->desTimeEdit->setText(QString("%1").arg(dl.time));
+    ui->desPercCheck->setChecked(dl.percentage);
+}
+
+void MainWindow::GuiToDestructionLevel(DestructionLevel &dl)
+{
+    dl.map_in = Utils::QStringToStdString(ui->desStateInEdit->text(), false);
+    dl.map_out = Utils::QStringToStdString(ui->desStateOutEdit->text(), false);
+    dl.damage = (uint32_t)ui->desDamageEdit->text().toInt();
+    dl.time = (uint32_t)ui->desTimeEdit->text().toInt();
+    dl.percentage = ui->desPercCheck->isChecked();
+}
+
+void MainWindow::ToggleDarkTheme(bool update_config)
+{
+    if (update_config)
+    {
+        config.dark_theme = !config.dark_theme;
+        config.Save();
+    }
+
+    static bool dark_theme = false;
+    static QPalette saved_palette;
+
+    if (!dark_theme)
+    {
+        saved_palette = qApp->palette();
+        //DPRINTF("%s\n", qApp->style()->metaObject()->className());
+
+        qApp->setStyle(QStyleFactory::create("Fusion"));
+        QPalette palette;
+        palette.setColor(QPalette::Window, QColor(53,53,53));
+        palette.setColor(QPalette::WindowText, Qt::white);
+        palette.setColor(QPalette::Base, QColor(15,15,15));
+        palette.setColor(QPalette::AlternateBase, QColor(53,53,53));
+        palette.setColor(QPalette::ToolTipBase, Qt::white);
+        palette.setColor(QPalette::ToolTipText, Qt::white);
+        palette.setColor(QPalette::Text, Qt::white);
+        palette.setColor(QPalette::Button, QColor(53,53,53));
+        palette.setColor(QPalette::ButtonText, Qt::white);
+        palette.setColor(QPalette::BrightText, Qt::red);
+
+        //palette.setColor(QPalette::Highlight, QColor(142,45,197).lighter());
+        palette.setColor(QPalette::HighlightedText, Qt::black);
+        palette.setColor(QPalette::Disabled, QPalette::Text, Qt::darkGray);
+        palette.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::darkGray);
+        qApp->setPalette(palette);
+
+        dark_theme =true;
+    }
+    else
+    {
+        qApp->setStyle(QStyleFactory::create("windowsvista"));
+        qApp->setPalette(saved_palette);
+        dark_theme = false;
+    }
+}
+
 void MainWindow::on_ikdCheck_clicked()
 {
     bool checked = ui->ikdCheck->isChecked();
@@ -10142,5 +10272,129 @@ void MainWindow::on_vlcCopyButton_triggered(QAction *arg1)
         if (vlc != game_vlc)
             delete vlc;
     }
+}
+
+
+void MainWindow::on_desCheck_clicked()
+{
+    if (ui->desCheck->isChecked())
+    {
+        ui->desComboBox->setEnabled(true);
+        ui->desAddButton->setEnabled(true);
+        ui->desRemoveButton->setEnabled(true);
+        ui->desStateInEdit->setEnabled(true);
+        ui->desStateOutEdit->setEnabled(true);
+        ui->desDamageEdit->setEnabled(true);
+        ui->desTimeEdit->setEnabled(true);
+        ui->desPercCheck->setEnabled(true);
+
+        // Clear combobox first
+        prev_des_index = -1;
+        ui->desComboBox->clear();
+
+        size_t num_des_stages = x2m->GetNumDestructionStages();
+
+        if (num_des_stages == 0)
+        {
+            DestructionLevel dl;
+
+            GuiToDestructionLevel(dl);
+            x2m->AddDestructionStage(dl);
+            num_des_stages++;
+        }
+
+        for (size_t i = 0; i < num_des_stages; i++)
+        {
+            ui->desComboBox->addItem(QString("Stage %1").arg(i));
+        }
+
+        if (num_des_stages == 1)
+        {
+            ui->desRemoveButton->setDisabled(true);
+        }
+    }
+    else
+    {
+        while (x2m->GetNumDestructionStages() != 0)
+            x2m->RemoveDestructionStage(0);
+
+        ui->desComboBox->setDisabled(true);
+        ui->desAddButton->setDisabled(true);
+        ui->desRemoveButton->setDisabled(true);
+        ui->desStateInEdit->setDisabled(true);
+        ui->desStateOutEdit->setDisabled(true);
+        ui->desDamageEdit->setDisabled(true);
+        ui->desTimeEdit->setDisabled(true);
+        ui->desPercCheck->setDisabled(true);
+    }
+}
+
+void MainWindow::on_desComboBox_currentIndexChanged(int index)
+{
+    if (index < 0 || index >= x2m->GetNumDestructionStages())
+        return;
+
+    if (prev_des_index >= 0 && prev_des_index < x2m->GetNumDestructionStages())
+    {
+        DestructionLevel &dl = x2m->GetDestructionStage(prev_des_index);
+        GuiToDestructionLevel(dl);
+    }
+
+    const DestructionLevel &dl = x2m->GetDestructionStage(index);
+    DestructionLevelToGui(dl);
+
+    prev_des_index = index;
+}
+
+
+void MainWindow::on_desAddButton_clicked()
+{
+    DestructionLevel dl;
+
+    int idx = ui->desComboBox->currentIndex();
+    if (idx >= 0 && idx < x2m->GetNumDestructionStages())
+    {
+        GuiToDestructionLevel(dl);
+    }
+
+    size_t pos = x2m->AddDestructionStage(dl);
+
+    ui->desComboBox->addItem(QString("Stage %1").arg(pos));
+    ui->desComboBox->setCurrentIndex((int)pos);
+
+    if (x2m->GetNumDestructionStages() > 1)
+        ui->desRemoveButton->setEnabled(true);
+}
+
+
+void MainWindow::on_desRemoveButton_clicked()
+{
+    int index = ui->desComboBox->currentIndex();
+
+    if (index < 0 || index >= x2m->GetNumDestructionStages())
+        return;
+
+    x2m->RemoveDestructionStage(index);
+
+    if (prev_des_index > index)
+        prev_des_index--;
+    else
+        prev_des_index = -1;
+
+    ui->desComboBox->removeItem(index);
+
+    for (int i = 0; i < ui->desComboBox->count(); i++)
+    {
+        ui->desComboBox->setItemText(i, QString("Stage %1").arg(i));
+    }
+
+    if (x2m->GetNumDestructionStages() == 1)
+        ui->desRemoveButton->setDisabled(true);
+}
+
+
+void MainWindow::on_actionToggle_dark_theme_triggered()
+{
+    ToggleDarkTheme(true);
 }
 

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
+    <width>980</width>
     <height>710</height>
    </rect>
   </property>
@@ -19,7 +19,7 @@
      <rect>
       <x>30</x>
       <y>20</y>
-      <width>842</width>
+      <width>922</width>
       <height>616</height>
      </rect>
     </property>
@@ -6743,6 +6743,171 @@
       </property>
      </widget>
     </widget>
+    <widget class="QWidget" name="desTab">
+     <property name="autoFillBackground">
+      <bool>true</bool>
+     </property>
+     <attribute name="title">
+      <string>Destruction</string>
+     </attribute>
+     <widget class="QCheckBox" name="desCheck">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>20</y>
+        <width>121</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Enable Destruction</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="desRemoveButton">
+      <property name="geometry">
+       <rect>
+        <x>630</x>
+        <y>20</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Remove</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="desAddButton">
+      <property name="geometry">
+       <rect>
+        <x>550</x>
+        <y>20</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Add</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="desComboBox">
+      <property name="geometry">
+       <rect>
+        <x>420</x>
+        <y>20</y>
+        <width>115</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_183">
+      <property name="geometry">
+       <rect>
+        <x>24</x>
+        <y>70</y>
+        <width>91</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>State in:</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="desStateInEdit">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>68</y>
+        <width>771</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_184">
+      <property name="geometry">
+       <rect>
+        <x>24</x>
+        <y>110</y>
+        <width>91</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>State out:</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="desStateOutEdit">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>108</y>
+        <width>771</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_185">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>150</y>
+        <width>131</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>HP damage condition:</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="desDamageEdit">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>148</y>
+        <width>71</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="desPercCheck">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>150</y>
+        <width>191</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Is percentage of base health</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_186">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>190</y>
+        <width>121</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Time (ms) condition:</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="desTimeEdit">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>188</y>
+        <width>71</width>
+        <height>22</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -6750,7 +6915,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>900</width>
+     <width>980</width>
      <height>22</height>
     </rect>
    </property>
@@ -6769,7 +6934,14 @@
     </property>
     <addaction name="actionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionToggle_dark_theme"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -7183,6 +7355,11 @@
    </property>
    <property name="toolTip">
     <string>From external VLC</string>
+   </property>
+  </action>
+  <action name="actionToggle_dark_theme">
+   <property name="text">
+    <string>Toggle dark theme</string>
    </property>
   </action>
  </widget>

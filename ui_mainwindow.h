@@ -88,6 +88,7 @@ public:
     QAction *actionFromExternalIkd;
     QAction *actionFromGameVlc;
     QAction *actionFromExternalVlc;
+    QAction *actionToggle_dark_theme;
     QWidget *centralWidget;
     QTabWidget *tabWidget;
     QWidget *modInfoTab;
@@ -617,9 +618,24 @@ public:
     QLineEdit *vlcX2Edit;
     QLabel *label_181;
     QLabel *label_182;
+    QWidget *desTab;
+    QCheckBox *desCheck;
+    QPushButton *desRemoveButton;
+    QPushButton *desAddButton;
+    QComboBox *desComboBox;
+    QLabel *label_183;
+    QLineEdit *desStateInEdit;
+    QLabel *label_184;
+    QLineEdit *desStateOutEdit;
+    QLabel *label_185;
+    QLineEdit *desDamageEdit;
+    QCheckBox *desPercCheck;
+    QLabel *label_186;
+    QLineEdit *desTimeEdit;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuHelp;
+    QMenu *menuView;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
 
@@ -627,7 +643,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(900, 710);
+        MainWindow->resize(980, 710);
         actionOpen = new QAction(MainWindow);
         actionOpen->setObjectName(QStringLiteral("actionOpen"));
         actionSave = new QAction(MainWindow);
@@ -736,11 +752,13 @@ public:
         actionFromGameVlc->setObjectName(QStringLiteral("actionFromGameVlc"));
         actionFromExternalVlc = new QAction(MainWindow);
         actionFromExternalVlc->setObjectName(QStringLiteral("actionFromExternalVlc"));
+        actionToggle_dark_theme = new QAction(MainWindow);
+        actionToggle_dark_theme->setObjectName(QStringLiteral("actionToggle_dark_theme"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         tabWidget = new QTabWidget(centralWidget);
         tabWidget->setObjectName(QStringLiteral("tabWidget"));
-        tabWidget->setGeometry(QRect(30, 20, 842, 616));
+        tabWidget->setGeometry(QRect(30, 20, 922, 616));
         tabWidget->setAutoFillBackground(true);
         modInfoTab = new QWidget();
         modInfoTab->setObjectName(QStringLiteral("modInfoTab"));
@@ -2414,14 +2432,60 @@ public:
         label_182->setObjectName(QStringLiteral("label_182"));
         label_182->setGeometry(QRect(90, 60, 41, 16));
         tabWidget->addTab(vlcTab, QString());
+        desTab = new QWidget();
+        desTab->setObjectName(QStringLiteral("desTab"));
+        desTab->setAutoFillBackground(true);
+        desCheck = new QCheckBox(desTab);
+        desCheck->setObjectName(QStringLiteral("desCheck"));
+        desCheck->setGeometry(QRect(20, 20, 121, 17));
+        desCheck->setAutoFillBackground(false);
+        desRemoveButton = new QPushButton(desTab);
+        desRemoveButton->setObjectName(QStringLiteral("desRemoveButton"));
+        desRemoveButton->setGeometry(QRect(630, 20, 75, 23));
+        desAddButton = new QPushButton(desTab);
+        desAddButton->setObjectName(QStringLiteral("desAddButton"));
+        desAddButton->setGeometry(QRect(550, 20, 75, 23));
+        desComboBox = new QComboBox(desTab);
+        desComboBox->setObjectName(QStringLiteral("desComboBox"));
+        desComboBox->setGeometry(QRect(420, 20, 115, 22));
+        label_183 = new QLabel(desTab);
+        label_183->setObjectName(QStringLiteral("label_183"));
+        label_183->setGeometry(QRect(24, 70, 91, 16));
+        desStateInEdit = new QLineEdit(desTab);
+        desStateInEdit->setObjectName(QStringLiteral("desStateInEdit"));
+        desStateInEdit->setGeometry(QRect(110, 68, 771, 20));
+        label_184 = new QLabel(desTab);
+        label_184->setObjectName(QStringLiteral("label_184"));
+        label_184->setGeometry(QRect(24, 110, 91, 16));
+        desStateOutEdit = new QLineEdit(desTab);
+        desStateOutEdit->setObjectName(QStringLiteral("desStateOutEdit"));
+        desStateOutEdit->setGeometry(QRect(110, 108, 771, 20));
+        label_185 = new QLabel(desTab);
+        label_185->setObjectName(QStringLiteral("label_185"));
+        label_185->setGeometry(QRect(30, 150, 131, 16));
+        desDamageEdit = new QLineEdit(desTab);
+        desDamageEdit->setObjectName(QStringLiteral("desDamageEdit"));
+        desDamageEdit->setGeometry(QRect(170, 148, 71, 22));
+        desPercCheck = new QCheckBox(desTab);
+        desPercCheck->setObjectName(QStringLiteral("desPercCheck"));
+        desPercCheck->setGeometry(QRect(270, 150, 191, 20));
+        label_186 = new QLabel(desTab);
+        label_186->setObjectName(QStringLiteral("label_186"));
+        label_186->setGeometry(QRect(40, 190, 121, 20));
+        desTimeEdit = new QLineEdit(desTab);
+        desTimeEdit->setObjectName(QStringLiteral("desTimeEdit"));
+        desTimeEdit->setGeometry(QRect(170, 188, 71, 22));
+        tabWidget->addTab(desTab, QString());
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 900, 22));
+        menuBar->setGeometry(QRect(0, 0, 980, 22));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
         menuHelp = new QMenu(menuBar);
         menuHelp->setObjectName(QStringLiteral("menuHelp"));
+        menuView = new QMenu(menuBar);
+        menuView->setObjectName(QStringLiteral("menuView"));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -2431,12 +2495,14 @@ public:
         MainWindow->setStatusBar(statusBar);
 
         menuBar->addAction(menuFile->menuAction());
+        menuBar->addAction(menuView->menuAction());
         menuBar->addAction(menuHelp->menuAction());
         menuFile->addAction(actionOpen);
         menuFile->addAction(actionSave);
         menuFile->addSeparator();
         menuFile->addAction(actionExit);
         menuHelp->addAction(actionAbout);
+        menuView->addAction(actionToggle_dark_theme);
         mainToolBar->addAction(actionOpen);
         mainToolBar->addAction(actionSave);
 
@@ -2637,6 +2703,7 @@ public:
 #ifndef QT_NO_TOOLTIP
         actionFromExternalVlc->setToolTip(QApplication::translate("MainWindow", "From external VLC", 0));
 #endif // QT_NO_TOOLTIP
+        actionToggle_dark_theme->setText(QApplication::translate("MainWindow", "Toggle dark theme", 0));
         label->setText(QApplication::translate("MainWindow", "Name:", 0));
         label_2->setText(QApplication::translate("MainWindow", "Version:", 0));
         label_3->setText(QApplication::translate("MainWindow", "Author:", 0));
@@ -3088,8 +3155,18 @@ public:
         label_181->setText(QApplication::translate("MainWindow", "Y2:", 0));
         label_182->setText(QApplication::translate("MainWindow", "X:", 0));
         tabWidget->setTabText(tabWidget->indexOf(vlcTab), QApplication::translate("MainWindow", "VLC", 0));
+        desCheck->setText(QApplication::translate("MainWindow", "Enable Destruction", 0));
+        desRemoveButton->setText(QApplication::translate("MainWindow", "Remove", 0));
+        desAddButton->setText(QApplication::translate("MainWindow", "Add", 0));
+        label_183->setText(QApplication::translate("MainWindow", "State in:", 0));
+        label_184->setText(QApplication::translate("MainWindow", "State out:", 0));
+        label_185->setText(QApplication::translate("MainWindow", "HP damage condition:", 0));
+        desPercCheck->setText(QApplication::translate("MainWindow", "Is percentage of base health", 0));
+        label_186->setText(QApplication::translate("MainWindow", "Time (ms) condition:", 0));
+        tabWidget->setTabText(tabWidget->indexOf(desTab), QApplication::translate("MainWindow", "Destruction", 0));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0));
         menuHelp->setTitle(QApplication::translate("MainWindow", "Help", 0));
+        menuView->setTitle(QApplication::translate("MainWindow", "View", 0));
     } // retranslateUi
 
 };

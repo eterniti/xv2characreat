@@ -294,6 +294,16 @@ private slots:
 
     void on_vlcCopyButton_triggered(QAction *arg1);
 
+    void on_desCheck_clicked();
+
+    void on_desComboBox_currentIndexChanged(int index);
+
+    void on_desAddButton_clicked();
+
+    void on_desRemoveButton_clicked();
+
+    void on_actionToggle_dark_theme_triggered();
+
 protected:
     void closeEvent(QCloseEvent *event);
 
@@ -322,6 +332,7 @@ private:
     int prev_ttcll_cost_index=-1;
     int prev_cnc_index=-1;
     int prev_ikd_index=-1;
+    int prev_des_index=-1;
 
     bool audio_playing=false;
     bool show_wait_onsave=false;
@@ -459,6 +470,11 @@ private:
 
     void VlcEntryToGui(const VlcEntry &entry);
     void GuiToVlcEntry(VlcEntry &entry);
+
+    void DestructionLevelToGui(const DestructionLevel &dl);
+    void GuiToDestructionLevel(DestructionLevel &dl);
+
+    void ToggleDarkTheme(bool update_config);
 };
 
 #endif // MAINWINDOW_H
