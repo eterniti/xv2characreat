@@ -10305,7 +10305,7 @@ void MainWindow::on_desCheck_clicked()
 
         for (size_t i = 0; i < num_des_stages; i++)
         {
-            ui->desComboBox->addItem(QString("Stage %1").arg(i));
+            ui->desComboBox->addItem(QString("Stage %1").arg(i+1));
         }
 
         if (num_des_stages == 1)
@@ -10359,7 +10359,7 @@ void MainWindow::on_desAddButton_clicked()
 
     size_t pos = x2m->AddDestructionStage(dl);
 
-    ui->desComboBox->addItem(QString("Stage %1").arg(pos));
+    ui->desComboBox->addItem(QString("Stage %1").arg(pos+1));
     ui->desComboBox->setCurrentIndex((int)pos);
 
     if (x2m->GetNumDestructionStages() > 1)
@@ -10385,7 +10385,7 @@ void MainWindow::on_desRemoveButton_clicked()
 
     for (int i = 0; i < ui->desComboBox->count(); i++)
     {
-        ui->desComboBox->setItemText(i, QString("Stage %1").arg(i));
+        ui->desComboBox->setItemText(i, QString("Stage %1").arg(i+1));
     }
 
     if (x2m->GetNumDestructionStages() == 1)
