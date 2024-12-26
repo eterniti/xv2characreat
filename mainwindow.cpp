@@ -4058,7 +4058,7 @@ void MainWindow::on_cusCopyButton_triggered(QAction *arg1)
         {
             int idx = dialog->GetResultInteger();
 
-            if (idx >= 0 && idx < cus->GetNumeSkillSets())
+            if (idx >= 0 && idx < cus->GetNumSkillSets())
             {
                 const CusSkillSet &entry = cus->GetSkillSet(idx);
                 SkillSetToGui(entry);
