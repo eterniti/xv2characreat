@@ -990,39 +990,6 @@
        </rect>
       </property>
      </widget>
-     <widget class="QLabel" name="label_14">
-      <property name="geometry">
-       <rect>
-        <x>49</x>
-        <y>190</y>
-        <width>47</width>
-        <height>13</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Flag GK2:</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="flagGK2ComboBox">
-      <property name="geometry">
-       <rect>
-        <x>110</x>
-        <y>186</y>
-        <width>69</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <item>
-       <property name="text">
-        <string>false</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>true</string>
-       </property>
-      </item>
-     </widget>
      <widget class="QLabel" name="label_15">
       <property name="geometry">
        <rect>
@@ -1176,7 +1143,7 @@
      <widget class="QLabel" name="label_141">
       <property name="geometry">
        <rect>
-        <x>510</x>
+        <x>535</x>
         <y>192</y>
         <width>91</width>
         <height>16</height>
@@ -1189,7 +1156,7 @@
      <widget class="QComboBox" name="voiceListenLangComboBox">
       <property name="geometry">
        <rect>
-        <x>600</x>
+        <x>625</x>
         <y>190</y>
         <width>111</width>
         <height>22</height>
@@ -1205,6 +1172,57 @@
         <string>English</string>
        </property>
       </item>
+     </widget>
+     <widget class="QCheckBox" name="slotHidden">
+      <property name="geometry">
+       <rect>
+        <x>24</x>
+        <y>340</y>
+        <width>91</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Hidden</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="villainCheckBox">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>187</y>
+        <width>151</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string>None</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Super Villain (GK2)</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Ultra Super Villain (CGK)</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="label_14">
+      <property name="geometry">
+       <rect>
+        <x>60</x>
+        <y>190</y>
+        <width>49</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Villain:</string>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="cmsTab">

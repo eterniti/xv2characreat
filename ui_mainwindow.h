@@ -153,8 +153,6 @@ public:
     QLineEdit *costumeIndexEdit;
     QLabel *label_13;
     QLineEdit *modelPresetEdit;
-    QLabel *label_14;
-    QComboBox *flagGK2ComboBox;
     QLabel *label_15;
     QPushButton *slotsRemoveButton;
     QLineEdit *voice1Edit;
@@ -169,6 +167,9 @@ public:
     QPushButton *voice2ListenButton;
     QLabel *label_141;
     QComboBox *voiceListenLangComboBox;
+    QCheckBox *slotHidden;
+    QComboBox *villainCheckBox;
+    QLabel *label_14;
     QWidget *cmsTab;
     QLabel *label_16;
     QLabel *label_17;
@@ -957,12 +958,6 @@ public:
         modelPresetEdit = new QLineEdit(slotsTab);
         modelPresetEdit->setObjectName(QStringLiteral("modelPresetEdit"));
         modelPresetEdit->setGeometry(QRect(110, 150, 81, 20));
-        label_14 = new QLabel(slotsTab);
-        label_14->setObjectName(QStringLiteral("label_14"));
-        label_14->setGeometry(QRect(49, 190, 47, 13));
-        flagGK2ComboBox = new QComboBox(slotsTab);
-        flagGK2ComboBox->setObjectName(QStringLiteral("flagGK2ComboBox"));
-        flagGK2ComboBox->setGeometry(QRect(110, 186, 69, 22));
         label_15 = new QLabel(slotsTab);
         label_15->setObjectName(QStringLiteral("label_15"));
         label_15->setGeometry(QRect(57, 230, 51, 20));
@@ -1003,10 +998,19 @@ public:
         voice2ListenButton->setGeometry(QRect(530, 270, 75, 23));
         label_141 = new QLabel(slotsTab);
         label_141->setObjectName(QStringLiteral("label_141"));
-        label_141->setGeometry(QRect(510, 192, 91, 16));
+        label_141->setGeometry(QRect(535, 192, 91, 16));
         voiceListenLangComboBox = new QComboBox(slotsTab);
         voiceListenLangComboBox->setObjectName(QStringLiteral("voiceListenLangComboBox"));
-        voiceListenLangComboBox->setGeometry(QRect(600, 190, 111, 22));
+        voiceListenLangComboBox->setGeometry(QRect(625, 190, 111, 22));
+        slotHidden = new QCheckBox(slotsTab);
+        slotHidden->setObjectName(QStringLiteral("slotHidden"));
+        slotHidden->setGeometry(QRect(24, 340, 91, 20));
+        villainCheckBox = new QComboBox(slotsTab);
+        villainCheckBox->setObjectName(QStringLiteral("villainCheckBox"));
+        villainCheckBox->setGeometry(QRect(110, 187, 151, 22));
+        label_14 = new QLabel(slotsTab);
+        label_14->setObjectName(QStringLiteral("label_14"));
+        label_14->setGeometry(QRect(60, 190, 49, 16));
         tabWidget->addTab(slotsTab, QString());
         cmsTab = new QWidget();
         cmsTab->setObjectName(QStringLiteral("cmsTab"));
@@ -2797,12 +2801,6 @@ public:
         );
         label_12->setText(QApplication::translate("MainWindow", "Costume index:", 0));
         label_13->setText(QApplication::translate("MainWindow", "Model preset:", 0));
-        label_14->setText(QApplication::translate("MainWindow", "Flag GK2:", 0));
-        flagGK2ComboBox->clear();
-        flagGK2ComboBox->insertItems(0, QStringList()
-         << QApplication::translate("MainWindow", "false", 0)
-         << QApplication::translate("MainWindow", "true", 0)
-        );
         label_15->setText(QApplication::translate("MainWindow", "Voice 1:", 0));
         slotsRemoveButton->setText(QApplication::translate("MainWindow", "Remove", 0));
         label_121->setText(QApplication::translate("MainWindow", "Voice 2:", 0));
@@ -2817,6 +2815,14 @@ public:
          << QApplication::translate("MainWindow", "Japanese", 0)
          << QApplication::translate("MainWindow", "English", 0)
         );
+        slotHidden->setText(QApplication::translate("MainWindow", "Hidden", 0));
+        villainCheckBox->clear();
+        villainCheckBox->insertItems(0, QStringList()
+         << QApplication::translate("MainWindow", "None", 0)
+         << QApplication::translate("MainWindow", "Super Villain (GK2)", 0)
+         << QApplication::translate("MainWindow", "Ultra Super Villain (CGK)", 0)
+        );
+        label_14->setText(QApplication::translate("MainWindow", "Villain:", 0));
         tabWidget->setTabText(tabWidget->indexOf(slotsTab), QApplication::translate("MainWindow", "Slots", 0));
         label_16->setText(QApplication::translate("MainWindow", "U_10 /  1?:", 0));
         label_17->setText(QApplication::translate("MainWindow", "Load cam dist:", 0));

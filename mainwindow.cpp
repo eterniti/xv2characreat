@@ -2072,6 +2072,13 @@ bool MainWindow::Build()
         return false;
     }
 
+    if (!x2m->IsInvisible() && x2m->GetNumNonHiddenSlotEntries() == 0)
+    {
+        ui->invisibleCheck->setChecked(true);
+        x2m->SetInvisible(true);
+        UPRINTF("Notice: because all slots were set to hidden, \"Do not install on CSS\" in [Mod info] tab has been checked.");
+    }
+
     X2mSlotEntry &slot_entry = x2m->GetSlotEntry(slot_idx);
     GuiToSlotEntry(slot_entry);
 
@@ -3279,11 +3286,42 @@ void MainWindow::ComboBoxToVoice(QComboBox *comboBox, QCheckBox *check, std::str
     voice_name = Utils::QStringToStdString(comboBox->itemText(comboBox->currentIndex()));
 }
 
+void MainWindow::VillainToGui(const X2mSlotEntry &entry)
+{
+    int idx = 0;
+
+    if (entry.flag_gk2)
+        idx = 1;
+    else if (entry.flag_cgk)
+        idx = 2;
+
+    ui->villainCheckBox->setCurrentIndex(idx);
+}
+
+void MainWindow::GuiToVillain(X2mSlotEntry &entry)
+{
+    if (ui->villainCheckBox->currentIndex() == 1)
+    {
+        entry.flag_gk2 = true;
+        entry.flag_cgk = false;
+    }
+    else if (ui->villainCheckBox->currentIndex() == 2)
+    {
+        entry.flag_gk2 = false;
+        entry.flag_cgk = true;
+    }
+    else
+    {
+        entry.flag_gk2 = false;
+        entry.flag_cgk = false;
+    }
+}
+
 void MainWindow::SlotEntryToGui(const X2mSlotEntry &entry)
 {
     ui->costumeIndexEdit->setText(QString("%1").arg(entry.costume_index));
     ui->modelPresetEdit->setText(QString("%1").arg(entry.model_preset));
-    ui->flagGK2ComboBox->setCurrentIndex(entry.flag_gk2 ? 1 : 0);
+    VillainToGui(entry);
 
     if (entry.voices_id_list[0] == X2M_DUMMY_ID)
         ui->voice1Edit->setText("-1");
@@ -3299,6 +3337,7 @@ void MainWindow::SlotEntryToGui(const X2mSlotEntry &entry)
     VoiceToComboBox(ui->voice2ComboBox, ui->voice2Check, ui->voice2Edit, entry.audio_files[1]);
 
     ui->costumeNameEdit->setText(Utils::StdStringToQString(entry.costume_name[ui->costumeNameLangComboBox->currentIndex()], false));
+    ui->slotHidden->setChecked(entry.hidden);
 
     //on_voice1Check_clicked();
     //on_voice2Check_clicked();
@@ -3308,9 +3347,10 @@ void MainWindow::GuiToSlotEntry(X2mSlotEntry &entry)
 {
     entry.costume_index = ui->costumeIndexEdit->text().toInt();
     entry.model_preset = ui->modelPresetEdit->text().toInt();
-    entry.flag_gk2 = (ui->flagGK2ComboBox->currentIndex() == 1);
+    GuiToVillain(entry);
     entry.voices_id_list[0] = ui->voice1Edit->text().toInt();
     entry.voices_id_list[1] = ui->voice2Edit->text().toInt();
+    entry.hidden = ui->slotHidden->isChecked();
     ComboBoxToVoice(ui->voice1ComboBox, ui->voice1Check, entry.audio_files[0]);
     ComboBoxToVoice(ui->voice2ComboBox, ui->voice2Check, entry.audio_files[1]);
 }

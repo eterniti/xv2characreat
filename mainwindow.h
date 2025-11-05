@@ -352,6 +352,8 @@ private:
 
     void VoiceToComboBox(QComboBox *comboBox, QCheckBox *check, QLineEdit *edit, const std::string &voice_name);
     void ComboBoxToVoice(QComboBox *comboBox, QCheckBox *check, std::string &voice_name);
+    void VillainToGui(const X2mSlotEntry &entry);
+    void GuiToVillain(X2mSlotEntry &entry);
     void SlotEntryToGui(const X2mSlotEntry &entry);
     void GuiToSlotEntry(X2mSlotEntry &entry);
 
