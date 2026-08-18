@@ -1007,7 +1007,7 @@ public:
         slotHidden->setGeometry(QRect(24, 340, 91, 20));
         villainCheckBox = new QComboBox(slotsTab);
         villainCheckBox->setObjectName(QStringLiteral("villainCheckBox"));
-        villainCheckBox->setGeometry(QRect(110, 187, 151, 22));
+        villainCheckBox->setGeometry(QRect(110, 187, 200, 22));
         label_14 = new QLabel(slotsTab);
         label_14->setObjectName(QStringLiteral("label_14"));
         label_14->setGeometry(QRect(60, 190, 49, 16));
@@ -2821,6 +2821,7 @@ public:
          << QApplication::translate("MainWindow", "None", 0)
          << QApplication::translate("MainWindow", "Super Villain (GK2)", 0)
          << QApplication::translate("MainWindow", "Ultra Super Villain (CGK)", 0)
+         << QApplication::translate("MainWindow", "Ultra Supervillain Quelled (KFK)", 0)
         );
         label_14->setText(QApplication::translate("MainWindow", "Villain:", 0));
         tabWidget->setTabText(tabWidget->indexOf(slotsTab), QApplication::translate("MainWindow", "Slots", 0));

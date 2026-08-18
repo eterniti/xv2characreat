@@ -3294,6 +3294,8 @@ void MainWindow::VillainToGui(const X2mSlotEntry &entry)
         idx = 1;
     else if (entry.flag_cgk)
         idx = 2;
+    else if (entry.flag_kfk)
+        idx = 3;
 
     ui->villainCheckBox->setCurrentIndex(idx);
 }
@@ -3304,16 +3306,25 @@ void MainWindow::GuiToVillain(X2mSlotEntry &entry)
     {
         entry.flag_gk2 = true;
         entry.flag_cgk = false;
+        entry.flag_kfk = false;
     }
     else if (ui->villainCheckBox->currentIndex() == 2)
     {
         entry.flag_gk2 = false;
         entry.flag_cgk = true;
+        entry.flag_kfk = false;
+    }
+    else if (ui->villainCheckBox->currentIndex() == 3)
+    {
+        entry.flag_gk2 = false;
+        entry.flag_cgk = false;
+        entry.flag_kfk = true;
     }
     else
     {
         entry.flag_gk2 = false;
         entry.flag_cgk = false;
+        entry.flag_kfk = false;
     }
 }
 

@@ -43,6 +43,7 @@ public:
     QLabel *label_6;
     QComboBox *dlcComboBox;
     QCheckBox *cgk2Check;
+    QCheckBox *kfkCheck;
 
     void setupUi(QDialog *SlotEditDialog)
     {
@@ -100,6 +101,9 @@ public:
         cgk2Check = new QCheckBox(SlotEditDialog);
         cgk2Check->setObjectName(QStringLiteral("cgk2Check"));
         cgk2Check->setGeometry(QRect(120, 190, 91, 17));
+        kfkCheck = new QCheckBox(SlotEditDialog);
+        kfkCheck->setObjectName(QStringLiteral("kfkCheck"));
+        kfkCheck->setGeometry(QRect(220, 190, 75, 17));
 
         retranslateUi(SlotEditDialog);
         QObject::connect(buttonBox, SIGNAL(rejected()), SlotEditDialog, SLOT(reject()));
@@ -146,8 +150,10 @@ public:
          << QApplication::translate("SlotEditDialog", "Dlc_18", 0)
          << QApplication::translate("SlotEditDialog", "Dlc_19", 0)
          << QApplication::translate("SlotEditDialog", "Dlc_20", 0)
+         << QApplication::translate("SlotEditDialog", "Dlc_21", 0)
         );
         cgk2Check->setText(QApplication::translate("SlotEditDialog", "Flag CGK2", 0));
+        kfkCheck->setText(QApplication::translate("SlotEditDialog", "Flag KFK", 0));
     } // retranslateUi
 
 };
